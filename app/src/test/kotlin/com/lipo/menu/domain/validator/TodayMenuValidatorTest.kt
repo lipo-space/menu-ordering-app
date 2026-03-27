@@ -6,6 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class TodayMenuValidatorTest {
 
@@ -21,12 +22,8 @@ class TodayMenuValidatorTest {
         // Given
         val date = LocalDate.now()
 
-        // When
-        val result = todayMenuValidator.validateMenuDate(date)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(date, result.getOrThrow())
+        // When & Then - should not throw exception
+        todayMenuValidator.validateMenuDate(date)
     }
 
     @Test
@@ -34,12 +31,8 @@ class TodayMenuValidatorTest {
         // Given
         val date = LocalDate.now().minusDays(5)
 
-        // When
-        val result = todayMenuValidator.validateMenuDate(date)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(date, result.getOrThrow())
+        // When & Then - should not throw exception
+        todayMenuValidator.validateMenuDate(date)
     }
 
     @Test
@@ -47,12 +40,8 @@ class TodayMenuValidatorTest {
         // Given
         val date = LocalDate.now().plusDays(1)
 
-        // When
-        val result = todayMenuValidator.validateMenuDate(date)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(date, result.getOrThrow())
+        // When & Then - should not throw exception
+        todayMenuValidator.validateMenuDate(date)
     }
 
     @Test
@@ -71,12 +60,8 @@ class TodayMenuValidatorTest {
         // Given
         val dishIds = listOf("dish1", "dish2", "dish3")
 
-        // When
-        val result = todayMenuValidator.validateDishSelection(dishIds)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(dishIds, result.getOrThrow())
+        // When & Then - should not throw exception
+        todayMenuValidator.validateDishSelection(dishIds)
     }
 
     @Test
@@ -84,12 +69,8 @@ class TodayMenuValidatorTest {
         // Given
         val dishIds = listOf("dish1")
 
-        // When
-        val result = todayMenuValidator.validateDishSelection(dishIds)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(dishIds, result.getOrThrow())
+        // When & Then - should not throw exception
+        todayMenuValidator.validateDishSelection(dishIds)
     }
 
     @Test

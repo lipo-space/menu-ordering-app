@@ -3,7 +3,7 @@ package com.lipo.menu.presentation.todaymenu
 import com.lipo.menu.data.model.Dish
 import com.lipo.menu.data.model.TodayMenu
 import com.lipo.menu.domain.usecase.dish.GetAllDishesUseCase
-import com.lipo.menu.domain.usecase.pairinglist.GetAllCombinationsUseCase
+import com.lipo.menu.domain.usecase.combination.GetAllCombinationsUseCase
 import com.lipo.menu.domain.usecase.todaymenu.AddDishToTodayMenuUseCase
 import com.lipo.menu.domain.usecase.todaymenu.ClearTodayMenuUseCase
 import com.lipo.menu.domain.usecase.todaymenu.CreateTodayMenuUseCase
@@ -61,9 +61,9 @@ class TodayMenuViewModelTest {
         getAllCombinationsUseCase = mockk()
 
         // Setup default behavior for flows
-        coEvery { getTodayMenuUseCase() } returns flowOf(null)
-        coEvery { getAllDishesUseCase() } returns flowOf(emptyList())
-        coEvery { getAllCombinationsUseCase() } returns flowOf(emptyList())
+        coEvery { getTodayMenuUseCase.invoke() } returns flowOf(null)
+        coEvery { getAllDishesUseCase.invoke() } returns flowOf(emptyList())
+        coEvery { getAllCombinationsUseCase.invoke() } returns flowOf(emptyList())
 
         viewModel = TodayMenuViewModel(
             getTodayMenuUseCase,
