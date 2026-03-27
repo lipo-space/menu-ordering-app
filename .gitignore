@@ -1,0 +1,77 @@
+*.iml
+.gradle
+.claude
+.gitignore
+CLAUDE.md
+specs
+openspec
+
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Kotlin/Android additional patterns
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.log
+*.apk
+*.ap_
+*.aab
+.env*
+*.tmp
+*.swp
+Thumbs.db
+
+# Android Studio
+*.iws
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/caches
+.idea/.name
+
+# NDK
+obj/
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Freeline
+freeline.py
+freeline/
+freeline_project_description.json
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+
+# Version control
+vcs.xml
+
+# lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+
+# Secrets and sensitive data
+secrets.properties
+keystore.properties
+*.jks
+*.keystore
