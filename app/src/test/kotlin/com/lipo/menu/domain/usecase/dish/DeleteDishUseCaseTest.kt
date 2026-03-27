@@ -33,7 +33,7 @@ class DeleteDishUseCaseTest {
     }
 
     @Test
-    fun invokeWithNon-existentIdReturnsFailure() = runTest {
+    fun invokeWithNonExistentIdReturnsFailure() = runTest {
         // Given
         val id = "non-existent"
         val exception = Exception("Dish not found")

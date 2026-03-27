@@ -217,7 +217,7 @@ class TodayMenuRepositoryTest {
     }
 
     @Test
-    fun todomainmodelShouldFilterOutSoft-deletedDishes() = runTest {
+    fun toDomainModelShouldFilterOutSoftDeletedDishes() = runTest {
         // Given
         val entity = createTodayMenuWithDishes(
             id = "1",

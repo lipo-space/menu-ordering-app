@@ -45,7 +45,7 @@ class UpdateDishUseCaseTest {
     }
 
     @Test
-    fun invokeWithNon-existentIdReturnsFailure() = runTest {
+    fun invokeWithNonExistentIdReturnsFailure() = runTest {
         // Given
         val id = "non-existent"
         val name = "Updated Dish"

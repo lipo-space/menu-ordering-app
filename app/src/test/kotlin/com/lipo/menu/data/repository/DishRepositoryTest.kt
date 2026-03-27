@@ -197,7 +197,7 @@ class DishRepositoryTest {
     }
 
     @Test
-    fun updatedishWithNon-existentIdShouldFail() = runTest {
+    fun updateDishWithNonExistentIdShouldFail() = runTest {
         // Given
         val id = "999"
         val name = "Updated Dish"
