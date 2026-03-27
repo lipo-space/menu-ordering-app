@@ -20,7 +20,7 @@ turbine = "1.0.0"
 detekt = "1.23.4"
 ksp = "1.9.22-1.0.17"
 supabase = "2.1.5"
-ktor = "3.0.0"
+ktor = "3.0.1"
 
 [libraries]
 # AndroidX Core

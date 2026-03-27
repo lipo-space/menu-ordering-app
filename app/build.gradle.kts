@@ -90,14 +90,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Supabase (使用 BOM 管理版本)
-    implementation(platform(libs.supabase.bom))
-    implementation(libs.supabase.postgrest)
-    implementation(libs.supabase.auth)
-    implementation(libs.supabase.realtime)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.utils)
+    // Supabase - 暂时注释以解决依赖问题
+    // implementation(platform(libs.supabase.bom))
+    // implementation(libs.supabase.postgrest)
+    // implementation(libs.supabase.auth)
+    // implementation(libs.supabase.realtime)
+    // implementation(libs.ktor.client.android)
+    // implementation(libs.ktor.client.core)
+    // implementation(libs.ktor.utils)
 
     // Testing - Unit
     testImplementation(libs.junit.api)
