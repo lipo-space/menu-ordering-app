@@ -3,6 +3,7 @@ package com.lipo.menu.data.repository
 import com.lipo.menu.data.local.database.dao.DishDao
 import com.lipo.menu.data.local.database.entities.DishEntity
 import com.lipo.menu.data.model.Dish
+import com.lipo.menu.data.remote.DishRemoteDataSource
 import com.lipo.menu.domain.repository.DishRepository
 import com.lipo.menu.util.DateUtils
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class DishRepositoryImpl @Inject constructor(
-    private val dishDao: DishDao
+    private val dishDao: DishDao,
+    private val remoteDataSource: DishRemoteDataSource
 ) : DishRepository {
 
     override fun getAllDishes(): Flow<List<Dish>> {
@@ -54,7 +56,12 @@ class DishRepositoryImpl @Inject constructor(
                 isDeleted = false
             )
 
+            // 1. 先同步到云端（实时同步策略）
+            remoteDataSource.upsertDish(dish)
+
+            // 2. 再保存到本地
             dishDao.insertDish(dish.toEntity())
+
             Result.success(dish)
         } catch (e: Exception) {
             Result.failure(e)
@@ -82,7 +89,12 @@ class DishRepositoryImpl @Inject constructor(
                 isDeleted = false
             )
 
+            // 1. 先同步到云端（实时同步策略）
+            remoteDataSource.upsertDish(updatedDish)
+
+            // 2. 再更新本地
             dishDao.updateDish(updatedDish.toEntity())
+
             Result.success(updatedDish)
         } catch (e: Exception) {
             Result.failure(e)
@@ -91,7 +103,12 @@ class DishRepositoryImpl @Inject constructor(
 
     override suspend fun deleteDish(id: String): Result<Unit> {
         return try {
+            // 1. 先在云端删除（实时同步策略）
+            remoteDataSource.deleteDish(id)
+
+            // 2. 再删除本地数据
             dishDao.softDeleteDish(id, DateUtils.getCurrentEpochMilli())
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

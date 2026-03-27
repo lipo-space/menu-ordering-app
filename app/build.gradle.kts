@@ -90,11 +90,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Supabase - Commented out for MVP, will be added later
-    // implementation(libs.supabase.kotlin)
-    // implementation(libs.supabase.postgrest)
-    // implementation(libs.supabase.auth)
-    // implementation(libs.supabase.realtime)
+    // Supabase
+    implementation(libs.supabase.kotlin)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.supabase.auth)
+    implementation(libs.supabase.realtime)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.core)
 
     // Testing - Unit
     testImplementation(libs.junit.api)
