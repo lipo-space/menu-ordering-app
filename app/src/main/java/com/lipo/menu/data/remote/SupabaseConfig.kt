@@ -1,7 +1,7 @@
 package com.lipo.menu.data.remote
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
@@ -19,21 +19,19 @@ import javax.inject.Singleton
 @Singleton
 class SupabaseConfig @Inject constructor() {
 
-    // TODO: 替换为你的 Supabase 配置
-    // 从 .env.local 文件或 Supabase Dashboard 获取
     companion object {
-        private const val SUPABASE_URL = "YOUR_SUPABASE_URL"  // 例如: https://xxxxxx.supabase.co
-        private const val SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"  // anon public key
+        private const val SUPABASE_URL = "https://yrredllhwswsfxvzhoka.supabase.co"
+        private const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlycmVkbGxod3N3c2Z4dnpob2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjMxODEsImV4cCI6MjA5MDE5OTE4MX0.M21uHSqkyPJ7r2wMumjYTSdQ0225gFVlOjDrPYw_zew"
     }
 
-    private val client: SupabaseClient = SupabaseClientBuilder(
+    private val client: SupabaseClient = createSupabaseClient(
         supabaseUrl = SUPABASE_URL,
         supabaseKey = SUPABASE_ANON_KEY
     ) {
         install(Postgrest)
         install(Auth)
         install(Realtime)
-    }.build()
+    }
 
     fun getClient(): SupabaseClient = client
 }
