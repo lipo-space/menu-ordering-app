@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:  # 允许手动触发
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     name: Build and Release
@@ -29,6 +32,11 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
+      - name: List APK files
+        run: |
+          echo "📁 Listing APK files..."
+          find app/build/outputs/apk -name "*.apk" -type f
+
       - name: Get version info
         id: version
         run: |
@@ -44,15 +52,22 @@ jobs:
 
       - name: Rename APK with version
         run: |
-          mv app/build/outputs/apk/debug/app-debug.apk \
-             app/build/outputs/apk/debug/menu-app-v${{ steps.version.outputs.version_name }}-b${{ steps.version.outputs.build_number }}.apk
+          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            mv app/build/outputs/apk/debug/app-debug.apk \
+               app/build/outputs/apk/debug/menu-app-v${{ steps.version.outputs.version_name }}-b${{ steps.version.outputs.build_number }}.apk
+            echo "✅ APK renamed successfully"
+            ls -lh app/build/outputs/apk/debug/
+          else
+            echo "❌ APK file not found!"
+            exit 1
+          fi
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
-          tag_name: v${{ steps.version.outputs.version_name }}-build${{ steps.version.outputs.build_number }}
+          tag_name: v${{ steps.version.outputs.version_name }}-b${{ steps.version.outputs.build_number }}
           name: Menu App v${{ steps.version.outputs.version_name }} (Build ${{ steps.version.outputs.build_number }})
           body: |
             ## 🎉 新版本发布
