@@ -79,7 +79,7 @@ class TodayMenuRepositoryTest {
             createTodayMenuWithDishes(id = "1", date = "2024-03-25"),
             createTodayMenuWithDishes(id = "2", date = "2024-03-26")
         )
-        every { todayMenuDao.getAllHistoricalMenus(any()) } returns flowOf(entities)
+        every { todayMenuDao.getAllHistoricalMenus() } returns flowOf(entities)
 
         // When
         val result = repository.getHistoricalMenus().first()
@@ -129,7 +129,7 @@ class TodayMenuRepositoryTest {
         // Given
         val date = LocalDate.of(2024, 3, 27)
         val dishIds = listOf("d1", "d2")
-        val createdEntity = createTodayMenuWithDishes(id = any(), date = "2024-03-27")
+        val createdEntity = createTodayMenuWithDishes(id = "new-id", date = "2024-03-27")
 
         coEvery { todayMenuDao.insertTodayMenu(any()) } returns Unit
         coEvery { todayMenuDao.insertTodayMenuDish(any()) } returns Unit

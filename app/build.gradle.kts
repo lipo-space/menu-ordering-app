@@ -102,10 +102,12 @@ dependencies {
     // Testing - Unit
     testImplementation(libs.junit.api)
     testImplementation(libs.junit.engine)
+    testImplementation(libs.junit.params)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.room.testing)
+    testImplementation(kotlin("test"))
 
     // Testing - Instrumentation
     androidTestImplementation(libs.androidx.junit)

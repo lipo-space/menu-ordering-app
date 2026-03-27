@@ -3,6 +3,7 @@ package com.lipo.menu.presentation.todaymenu
 import com.lipo.menu.data.model.Dish
 import com.lipo.menu.data.model.TodayMenu
 import com.lipo.menu.domain.usecase.dish.GetAllDishesUseCase
+import com.lipo.menu.domain.usecase.pairinglist.GetAllCombinationsUseCase
 import com.lipo.menu.domain.usecase.todaymenu.AddDishToTodayMenuUseCase
 import com.lipo.menu.domain.usecase.todaymenu.ClearTodayMenuUseCase
 import com.lipo.menu.domain.usecase.todaymenu.CreateTodayMenuUseCase
@@ -40,6 +41,7 @@ class TodayMenuViewModelTest {
     private lateinit var removeDishFromTodayMenuUseCase: RemoveDishFromTodayMenuUseCase
     private lateinit var clearTodayMenuUseCase: ClearTodayMenuUseCase
     private lateinit var getAllDishesUseCase: GetAllDishesUseCase
+    private lateinit var getAllCombinationsUseCase: GetAllCombinationsUseCase
     private lateinit var viewModel: TodayMenuViewModel
 
     private val testDispatcher = StandardTestDispatcher()
@@ -56,10 +58,12 @@ class TodayMenuViewModelTest {
         removeDishFromTodayMenuUseCase = mockk()
         clearTodayMenuUseCase = mockk()
         getAllDishesUseCase = mockk()
+        getAllCombinationsUseCase = mockk()
 
         // Setup default behavior for flows
         coEvery { getTodayMenuUseCase() } returns flowOf(null)
         coEvery { getAllDishesUseCase() } returns flowOf(emptyList())
+        coEvery { getAllCombinationsUseCase() } returns flowOf(emptyList())
 
         viewModel = TodayMenuViewModel(
             getTodayMenuUseCase,
@@ -69,7 +73,8 @@ class TodayMenuViewModelTest {
             addDishToTodayMenuUseCase,
             removeDishFromTodayMenuUseCase,
             clearTodayMenuUseCase,
-            getAllDishesUseCase
+            getAllDishesUseCase,
+            getAllCombinationsUseCase
         )
     }
 
