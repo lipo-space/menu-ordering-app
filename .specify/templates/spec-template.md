@@ -85,15 +85,20 @@
 ### Functional Requirements
 
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+*Constitutional Requirements (Offline-First Architecture)*:
+- **FR-006**: Feature MUST function without network connectivity using local Room cache
+- **FR-007**: Data sync MUST happen asynchronously without blocking UI
+- **FR-008**: Users MUST be notified of sync status (syncing, synced, offline, conflict)
+
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-009**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-010**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -113,6 +118,12 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+*Constitutional Performance Requirements (Performance Excellence)*:
+- **SC-005**: Cold startup time MUST be under 2 seconds
+- **SC-006**: All animations MUST maintain 60fps (no frame drops)
+- **SC-007**: UI operations MUST complete within 16ms
+- **SC-008**: Memory usage MUST stay under 150MB under normal operation
 
 ## Assumptions
 

@@ -157,6 +157,14 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
 
+### Performance Validation (Constitutional Requirement)
+
+- [ ] TXXX Run startup time benchmarks (MUST be under 2 seconds)
+- [ ] TXXX Profile animations with Systrace (MUST maintain 60fps)
+- [ ] TXXX Memory leak detection with LeakCanary
+- [ ] TXXX Validate offline functionality (disable network, test all features)
+- [ ] TXXX Test sync conflict resolution scenarios
+
 ---
 
 ## Dependencies & Execution Order

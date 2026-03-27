@@ -31,7 +31,15 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with all constitutional principles:
+
+- [ ] **Offline-First**: Does this feature work without network connectivity?
+- [ ] **Test-Driven Development**: Are tests defined before implementation?
+- [ ] **Performance Excellence**: Does this feature meet startup (<2s) and animation (60fps) budgets?
+- [ ] **Minimalist Design**: Is this feature necessary? Can it be simpler?
+- [ ] **Automated Deployment**: Is CI/CD pipeline configured for this feature?
+
+Document any violations in the Complexity Tracking table below.
 
 ## Project Structure
 
