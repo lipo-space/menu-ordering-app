@@ -5,6 +5,7 @@ import com.lipo.menu.data.local.database.entities.DishEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuDishEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuWithDishes
+import com.lipo.menu.data.remote.TodayMenuRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -22,12 +23,14 @@ import java.time.LocalDate
 class TodayMenuRepositoryTest {
 
     private lateinit var todayMenuDao: TodayMenuDao
+    private lateinit var remoteDataSource: TodayMenuRemoteDataSource
     private lateinit var repository: TodayMenuRepositoryImpl
 
     @Before
     fun setup() {
         todayMenuDao = mockk()
-        repository = TodayMenuRepositoryImpl(todayMenuDao)
+        remoteDataSource = mockk(relaxed = true)
+        repository = TodayMenuRepositoryImpl(todayMenuDao, remoteDataSource)
     }
 
     @Test
