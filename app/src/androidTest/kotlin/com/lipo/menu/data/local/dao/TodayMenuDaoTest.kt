@@ -41,7 +41,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "insertTodayMenu should insert menu successfully"() = runTest {
+    fun insertTodayMenuShouldInsertMenuSuccessfully() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "1", date = "2024-03-27")
 
@@ -55,7 +55,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "insertTodayMenu with duplicate date should abort"() = runTest {
+    fun insertTodayMenuWithDuplicateDateShouldAbort() = runTest {
         // Given
         val menu1 = createTodayMenuEntity(id = "1", date = "2024-03-27")
         val menu2 = createTodayMenuEntity(id = "2", date = "2024-03-27")
@@ -71,7 +71,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "updateTodayMenu should update existing menu"() = runTest {
+    fun updateTodayMenuShouldUpdateExistingMenu() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "1", date = "2024-03-27")
         todayMenuDao.insertTodayMenu(menu)
@@ -88,7 +88,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "deleteTodayMenu should remove menu"() = runTest {
+    fun deleteTodayMenuShouldRemoveMenu() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "1", date = "2024-03-27")
         todayMenuDao.insertTodayMenu(menu)
@@ -102,7 +102,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "getTodayMenuByDate should return menu for given date"() = runTest {
+    fun getTodayMenuByDateShouldReturnMenuForGivenDate() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "1", date = "2024-03-27")
         todayMenuDao.insertTodayMenu(menu)
@@ -116,7 +116,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "getTodayMenuByDate should return null for non-existent date"() = runTest {
+    fun getTodayMenuByDateShouldReturnNullForNonExistentDate() = runTest {
         // Given - empty database
 
         // When
@@ -127,7 +127,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "getAllHistoricalMenus should return menus before today"() = runTest {
+    fun getAllHistoricalMenusShouldReturnMenusBeforeToday() = runTest {
         // Given
         val historicalMenu1 = createTodayMenuEntity(id = "1", date = "2024-03-25")
         val historicalMenu2 = createTodayMenuEntity(id = "2", date = "2024-03-26")
@@ -146,7 +146,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "getMenusByDateRange should return menus within range"() = runTest {
+    fun getMenusByDateRangeShouldReturnMenusWithinRange() = runTest {
         // Given
         val menu1 = createTodayMenuEntity(id = "1", date = "2024-03-20")
         val menu2 = createTodayMenuEntity(id = "2", date = "2024-03-25")
@@ -165,7 +165,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "searchMenusByDishName should return menus containing matching dishes"() = runTest {
+    fun searchMenusByDishNameShouldReturnMenusContainingMatchingDishes() = runTest {
         // Given
         val dish1 = createDishEntity(id = "d1", name = "Chicken Curry")
         val dish2 = createDishEntity(id = "d2", name = "Beef Steak")
@@ -227,7 +227,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "deleteTodayMenuDishesByMenu should remove all dishes from menu"() = runTest {
+    fun deleteTodayMenuDishesByMenuShouldRemoveAllDishesFromMenu() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "m1", date = "2024-03-27")
         val dish1 = createDishEntity(id = "d1", name = "Dish 1")
@@ -248,7 +248,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "deleting menu should cascade delete menu dishes"() = runTest {
+    fun deletingMenuShouldCascadeDeleteMenuDishes() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "m1", date = "2024-03-27")
         val dish = createDishEntity(id = "d1", name = "Test Dish")
