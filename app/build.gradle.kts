@@ -95,11 +95,11 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Supabase - 云端数据库同步（不使用 BOM，直接指定版本）
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.5")
-    implementation("io.github.jan-tennert.supabase:auth-kt:2.1.5")
-    implementation("io.github.jan-tennert.supabase:realtime-kt:2.1.5")
-    implementation("io.github.jan-tennert.supabase:supabase-kt:2.1.5")
+    // Supabase - 云端数据库同步
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.4.0"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
     implementation("io.ktor:ktor-client-android:3.0.1")
     implementation("io.ktor:ktor-client-core:3.0.1")
     implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
