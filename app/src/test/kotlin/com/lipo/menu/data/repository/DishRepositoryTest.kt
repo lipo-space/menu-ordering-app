@@ -3,6 +3,7 @@ package com.lipo.menu.data.repository
 import com.lipo.menu.data.local.database.dao.DishDao
 import com.lipo.menu.data.local.database.entities.DishEntity
 import com.lipo.menu.data.model.Dish
+import com.lipo.menu.data.remote.DishRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -19,12 +20,14 @@ import java.time.Instant
 class DishRepositoryTest {
 
     private lateinit var dishDao: DishDao
+    private lateinit var remoteDataSource: DishRemoteDataSource
     private lateinit var repository: DishRepositoryImpl
 
     @Before
     fun setup() {
         dishDao = mockk()
-        repository = DishRepositoryImpl(dishDao)
+        remoteDataSource = mockk(relaxed = true)  // relaxed = true 会为所有方法提供默认实现
+        repository = DishRepositoryImpl(dishDao, remoteDataSource)
     }
 
     @Test
@@ -115,6 +118,7 @@ class DishRepositoryTest {
         val description = "Description"
         coEvery { dishDao.dishNameExists(name, null) } returns false
         coEvery { dishDao.insertDish(any()) } returns Unit
+        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
 
         // When
         val result = repository.addDish(name, description)
@@ -124,6 +128,7 @@ class DishRepositoryTest {
         assertEquals(name, result.getOrNull()?.name)
         assertEquals(description, result.getOrNull()?.description)
         coVerify { dishDao.insertDish(any()) }
+        coVerify { remoteDataSource.upsertDish(any()) }
     }
 
     @Test
@@ -148,6 +153,7 @@ class DishRepositoryTest {
         val description = "  Description  "
         coEvery { dishDao.dishNameExists("Dish Name", null) } returns false
         coEvery { dishDao.insertDish(any()) } returns Unit
+        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
 
         // When
         val result = repository.addDish(name, description)
@@ -169,6 +175,7 @@ class DishRepositoryTest {
         coEvery { dishDao.dishNameExists(name, id) } returns false
         coEvery { dishDao.getDishByIdSync(id) } returns existingEntity
         coEvery { dishDao.updateDish(any()) } returns Unit
+        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
 
         // When
         val result = repository.updateDish(id, name, description)
@@ -178,6 +185,7 @@ class DishRepositoryTest {
         assertEquals(name, result.getOrNull()?.name)
         assertEquals(description, result.getOrNull()?.description)
         coVerify { dishDao.updateDish(any()) }
+        coVerify { remoteDataSource.upsertDish(any()) }
     }
 
     @Test
@@ -218,6 +226,7 @@ class DishRepositoryTest {
         // Given
         val id = "1"
         coEvery { dishDao.softDeleteDish(eq(id), any()) } returns Unit
+        coEvery { remoteDataSource.deleteDish(id) } returns Unit
 
         // When
         val result = repository.deleteDish(id)
@@ -225,6 +234,7 @@ class DishRepositoryTest {
         // Then
         assertTrue(result.isSuccess)
         coVerify { dishDao.softDeleteDish(eq(id), any()) }
+        coVerify { remoteDataSource.deleteDish(id) }
     }
 
     @Test
