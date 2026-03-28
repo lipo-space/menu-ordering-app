@@ -2,7 +2,7 @@ package com.lipo.menu.data.remote
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class SupabaseConfig @Inject constructor() {
         supabaseKey = SUPABASE_ANON_KEY
     ) {
         install(Postgrest)
-        install(Auth)
+        install(GoTrue)
         install(Realtime)
     }
 
