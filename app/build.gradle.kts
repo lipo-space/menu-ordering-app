@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.lipo.menu"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.lipo.menu"
