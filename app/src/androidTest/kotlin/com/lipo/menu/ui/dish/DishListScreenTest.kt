@@ -179,8 +179,10 @@ class DishListScreenTest {
             }
         }
 
-        // Then
-        composeTestRule.onNodeWithText("确认删除").assertIsDisplayed()
+        // Then - 验证标题（没有点击动作的文本）
+        composeTestRule.onNode(
+            hasText("确认删除") and not(hasClickAction())
+        ).assertIsDisplayed()
         composeTestRule.onNode(hasText("Chicken Curry", substring = true)).assertIsDisplayed()
     }
 
@@ -200,9 +202,12 @@ class DishListScreenTest {
             }
         }
 
-        // Then
+        // Then - 验证取消按钮
         composeTestRule.onNodeWithText("取消").assertIsDisplayed()
-        composeTestRule.onNodeWithText("确认删除").assertIsDisplayed()
+        // 验证确认删除按钮（有点击动作的文本）
+        composeTestRule.onNode(
+            hasText("确认删除") and hasClickAction()
+        ).assertIsDisplayed()
     }
 
     @Test
