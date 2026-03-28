@@ -36,7 +36,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "getAllDishes should return all non-deleted dishes sorted by name"() = runTest {
+    fun getAllDishesShouldReturnAllNonDeletedDishesSortedByName() = runTest {
         // Given
         val dish1 = createDishEntity(id = "1", name = "Zebra Dish")
         val dish2 = createDishEntity(id = "2", name = "Apple Dish")
@@ -59,7 +59,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "searchDishes should return matching dishes limited to 100 results"() = runTest {
+    fun searchDishesShouldReturnMatchingDishesLimitedTo100Results() = runTest {
         // Given
         val matchingDish = createDishEntity(id = "1", name = "Chicken Curry")
         val nonMatchingDish = createDishEntity(id = "2", name = "Beef Steak")
@@ -75,7 +75,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "searchDishes should exclude deleted dishes"() = runTest {
+    fun searchDishesShouldExcludeDeletedDishes() = runTest {
         // Given
         val activeDish = createDishEntity(id = "1", name = "Chicken Curry")
         val deletedDish = createDishEntity(id = "2", name = "Chicken Wings", isDeleted = true)
@@ -91,7 +91,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "getDishById should return dish when found"() = runTest {
+    fun getDishByIdShouldReturnDishWhenFound() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Test Dish")
         dishDao.insertDish(dish)
@@ -105,7 +105,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "getDishById should return null for deleted dish"() = runTest {
+    fun getDishByIdShouldReturnNullForDeletedDish() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Test Dish", isDeleted = true)
         dishDao.insertDish(dish)
@@ -118,7 +118,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "getDishByIdSync should return dish when found"() = runTest {
+    fun getDishByIdSyncShouldReturnDishWhenFound() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Test Dish")
         dishDao.insertDish(dish)
@@ -132,7 +132,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "insertDish should insert dish successfully"() = runTest {
+    fun insertDishShouldInsertDishSuccessfully() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "New Dish")
 
@@ -146,7 +146,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "insertDish with duplicate id should abort"() = runTest {
+    fun insertDishWithDuplicateIdShouldAbort() = runTest {
         // Given
         val dish1 = createDishEntity(id = "1", name = "Dish 1")
         val dish2 = createDishEntity(id = "1", name = "Dish 2")
@@ -162,7 +162,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "updateDish should update existing dish"() = runTest {
+    fun updateDishShouldUpdateExistingDish() = runTest {
         // Given
         val originalDish = createDishEntity(id = "1", name = "Original Name")
         dishDao.insertDish(originalDish)
@@ -183,7 +183,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "softDeleteDish should mark dish as deleted"() = runTest {
+    fun softDeleteDishShouldMarkDishAsDeleted() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Test Dish")
         dishDao.insertDish(dish)
@@ -200,7 +200,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should return true for existing name"() = runTest {
+    fun dishNameExistsShouldReturnTrueForExistingName() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Chicken Curry")
         dishDao.insertDish(dish)
@@ -213,7 +213,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should return false for non-existing name"() = runTest {
+    fun dishNameExistsShouldReturnFalseForNonExistingName() = runTest {
         // Given - empty database
 
         // When
@@ -224,7 +224,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should be case-insensitive"() = runTest {
+    fun dishNameExistsShouldBeCaseInsensitive() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Chicken Curry")
         dishDao.insertDish(dish)
@@ -241,7 +241,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should exclude deleted dishes"() = runTest {
+    fun dishNameExistsShouldExcludeDeletedDishes() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Chicken Curry", isDeleted = true)
         dishDao.insertDish(dish)
@@ -254,7 +254,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should exclude specified id"() = runTest {
+    fun dishNameExistsShouldExcludeSpecifiedId() = runTest {
         // Given
         val dish = createDishEntity(id = "1", name = "Chicken Curry")
         dishDao.insertDish(dish)
@@ -267,7 +267,7 @@ class DishDaoTest {
     }
 
     @Test
-    fun "dishNameExists should return true when different dish has same name"() = runTest {
+    fun dishNameExistsShouldReturnTrueWhenDifferentDishHasSameName() = runTest {
         // Given
         val dish1 = createDishEntity(id = "1", name = "Chicken Curry")
         val dish2 = createDishEntity(id = "2", name = "Beef Steak")

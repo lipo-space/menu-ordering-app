@@ -189,7 +189,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "insertTodayMenuDish should add dish to menu"() = runTest {
+    fun insertTodayMenuDishShouldAddDishToMenu() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "m1", date = "2024-03-27")
         val dish = createDishEntity(id = "d1", name = "Test Dish")
@@ -209,7 +209,7 @@ class TodayMenuDaoTest {
     }
 
     @Test
-    fun "deleteTodayMenuDish should remove dish from menu"() = runTest {
+    fun deleteTodayMenuDishShouldRemoveDishFromMenu() = runTest {
         // Given
         val menu = createTodayMenuEntity(id = "m1", date = "2024-03-27")
         val dish = createDishEntity(id = "d1", name = "Test Dish")
