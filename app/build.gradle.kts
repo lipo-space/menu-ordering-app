@@ -95,9 +95,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Supabase - 云端数据库同步
+    // Supabase - 云端数据库同步 (版本 2.x 使用 gotrue-kt，3.0+ 才用 auth-kt)
     implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.3")
-    implementation("io.github.jan-tennert.supabase:auth-kt:2.4.3")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.4.3")
     implementation("io.github.jan-tennert.supabase:realtime-kt:2.4.3")
     implementation("io.ktor:ktor-client-android:2.3.11")
     implementation("io.ktor:ktor-client-core:2.3.11")
