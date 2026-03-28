@@ -1,7 +1,13 @@
 package com.lipo.menu.ui.dish
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasNoClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNode
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.material3.MaterialTheme
 import com.lipo.menu.data.model.Dish
 import com.lipo.menu.presentation.dish.DishItem
@@ -181,7 +187,7 @@ class DishListScreenTest {
 
         // Then - 验证标题（没有点击动作的文本）
         composeTestRule.onNode(
-            hasText("确认删除") and not(hasClickAction())
+            hasText("确认删除") and hasNoClickAction()
         ).assertIsDisplayed()
         composeTestRule.onNode(hasText("Chicken Curry", substring = true)).assertIsDisplayed()
     }
