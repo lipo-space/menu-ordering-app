@@ -96,14 +96,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     // Supabase - 云端数据库同步
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.3")
-    implementation("io.github.jan-tennert.supabase:auth-kt:2.1.3")
-    implementation("io.github.jan-tennert.supabase:realtime-kt:2.1.3")
-    implementation("io.ktor:ktor-client-android:2.3.7")
-    implementation("io.ktor:ktor-client-core:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-    implementation("io.ktor:ktor-utils:2.3.7")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.3")
+    implementation("io.github.jan-tennert.supabase:auth-kt:2.4.3")
+    implementation("io.github.jan-tennert.supabase:realtime-kt:2.4.3")
+    implementation("io.ktor:ktor-client-android:2.3.11")
+    implementation("io.ktor:ktor-client-core:2.3.11")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+    implementation("io.ktor:ktor-utils:2.3.11")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Testing - Unit
