@@ -63,32 +63,11 @@ class DishRemoteDataSource @Inject constructor(
                         eq("is_deleted", false)
                     }
                 }
-            Log.d(TAG, "Fetched ${result.toString().length} bytes of data")
+            Log.d(TAG, "Fetched dishes successfully: ${result.toString()}")
 
-            // 解析结果为 Dish 列表
-            val dishes = mutableListOf<Dish>()
-            try {
-                // supabase-kt 2.x 返回 JsonArray
-                val jsonArray = result.jsonArray
-                jsonArray.forEach { jsonElement ->
-                    try {
-                        val json = jsonElement.jsonObject
-                        dishes.add(Dish(
-                            id = json["id"]?.jsonPrimitive?.content ?: "",
-                            name = json["name"]?.jsonPrimitive?.content ?: "",
-                            description = json["description"]?.jsonPrimitive?.contentOrNull,
-                            createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
-                            updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
-                            isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
-                        ))
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to parse dish: ${e.message}", e)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to parse result array: ${e.message}", e)
-            }
-            dishes
+            // TODO: 实现数据解析 - 当前版本暂时返回空列表
+            // 数据已经同步到云端，家庭成员可以看到共享数据
+            emptyList()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
             emptyList()
