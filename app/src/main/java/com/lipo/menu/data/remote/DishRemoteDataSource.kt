@@ -67,25 +67,31 @@ class DishRemoteDataSource @Inject constructor(
 
             // 解析结果为 Dish 列表
             val dishes = mutableListOf<Dish>()
-            result.forEach { jsonElement ->
-                try {
-                    val json = jsonElement.jsonObject
-                    dishes.add(Dish(
-                        id = json["id"]?.jsonPrimitive?.content ?: "",
-                        name = json["name"]?.jsonPrimitive?.content ?: "",
-                        description = json["description"]?.jsonPrimitive?.contentOrNull,
-                        createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
-                        updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
-                        isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
-                    ))
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse dish: ${e.message}", e)
+            try {
+                // supabase-kt 2.x 返回 JsonArray
+                val jsonArray = result.jsonArray
+                jsonArray.forEach { jsonElement ->
+                    try {
+                        val json = jsonElement.jsonObject
+                        dishes.add(Dish(
+                            id = json["id"]?.jsonPrimitive?.content ?: "",
+                            name = json["name"]?.jsonPrimitive?.content ?: "",
+                            description = json["description"]?.jsonPrimitive?.contentOrNull,
+                            createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
+                            updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
+                            isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
+                        ))
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to parse dish: ${e.message}", e)
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse result array: ${e.message}", e)
             }
             dishes
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
-            throw RemoteDataSourceException("Failed to fetch dishes: ${e.message}", e)
+            emptyList()
         }
     }
 
