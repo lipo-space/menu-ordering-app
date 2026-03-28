@@ -43,7 +43,7 @@ interface TodayMenuDao {
         SELECT DISTINCT tm.* FROM today_menus tm
         INNER JOIN today_menu_dishes tmd ON tm.id = tmd.today_menu_id
         INNER JOIN dishes d ON tmd.dish_id = d.id
-        WHERE LOWER(d.name) LIKE LOWER(:query)
+        WHERE LOWER(d.name) LIKE '%' || LOWER(:query) || '%'
         ORDER BY tm.date DESC
         """
     )

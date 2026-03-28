@@ -191,7 +191,7 @@ class DishDaoTest {
 
         // When
         dishDao.softDeleteDish("1", updatedAt)
-        val result = dishDao.getDishByIdSync("1")
+        val result = dishDao.getDishByIdIncludeDeleted("1")
 
         // Then
         assertNotNull(result)

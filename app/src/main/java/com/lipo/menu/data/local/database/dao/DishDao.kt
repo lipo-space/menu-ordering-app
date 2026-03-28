@@ -22,6 +22,9 @@ interface DishDao {
     @Query("SELECT * FROM dishes WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun getDishByIdSync(id: String): DishEntity?
 
+    @Query("SELECT * FROM dishes WHERE id = :id LIMIT 1")
+    suspend fun getDishByIdIncludeDeleted(id: String): DishEntity?
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertDish(dish: DishEntity)
 

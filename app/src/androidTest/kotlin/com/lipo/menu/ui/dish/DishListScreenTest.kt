@@ -180,7 +180,7 @@ class DishListScreenTest {
         }
 
         // Then
-        composeTestRule.onNodeWithText("Delete Dish").assertIsDisplayed()
+        composeTestRule.onNodeWithText("确认删除").assertIsDisplayed()
         composeTestRule.onNode(hasText("Chicken Curry", substring = true)).assertIsDisplayed()
     }
 
@@ -201,8 +201,8 @@ class DishListScreenTest {
         }
 
         // Then
-        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Delete").assertIsDisplayed()
+        composeTestRule.onNodeWithText("取消").assertIsDisplayed()
+        composeTestRule.onNodeWithText("确认删除").assertIsDisplayed()
     }
 
     @Test
@@ -222,7 +222,7 @@ class DishListScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.onNodeWithText("取消").performClick()
 
         // Then
         assert(dismissClicked)
@@ -245,7 +245,10 @@ class DishListScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Delete").performClick()
+        // 使用 hasText 和 isClickable 来找到确认按钮（因为有两个"确认删除"文本）
+        composeTestRule.onNode(
+            hasText("确认删除") and hasClickAction()
+        ).performClick()
 
         // Then
         assert(confirmClicked)
