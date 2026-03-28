@@ -1,151 +1,102 @@
-# Supabase 数据库配置指南
+# Supabase 云端同步设置指南
 
-## 📋 前提条件
+## 概述
 
-- ✅ 已有 Supabase 账号
-- ✅ 代码已推送到 GitHub（https://github.com/lipo-space/menu-ordering-app）
+这个应用使用 Supabase 作为云端数据库，让你的家庭成员可以共享同一份菜单数据。
 
----
+## 第一步：在 Supabase 中创建数据库表
 
-## 第一步：创建 Supabase 项目
+1. 访问你的 Supabase Dashboard：https://supabase.com/dashboard
+2. 选择你的项目（或创建一个新项目）
+3. 点击左侧菜单的 "SQL Editor"
+4. 复制 `supabase_schema.sql` 文件中的所有内容
+5. 粘贴到 SQL Editor 并点击 "Run"
 
-1. **访问 Supabase Dashboard**
-   - 打开 https://supabase.com/dashboard
-   - 登录你的账号
+这将创建以下表：
+- `dishes` - 菜品表
+- `today_menus` - 每日菜单表
+- `today_menu_dishes` - 菜单-菜品关联表
+- `dish_combinations` - 菜品搭配表
+- `combination_dishes` - 搭配-菜品关联表
 
-2. **创建新项目**
-   - 点击 "New Project" 按钮
-   - 选择组织（Organization）
-   - 填写项目信息：
-     - **Name**: `menu-app`（或你喜欢的名称）
-     - **Database Password**: 设置一个强密码（**务必保存好**）
-     - **Region**: 选择离你最近的区域（推荐：Singapore）
-   - 点击 "Create new project"
-   - 等待约 2 分钟，项目创建完成
+## 第二步：获取你的 Supabase 凭证
 
----
+1. 在 Supabase Dashboard，点击左侧 "Settings" (齿轮图标)
+2. 点击 "API"
+3. 复制以下两个值：
+   - **Project URL** (类似 `https://xxxxx.supabase.co`)
+   - **anon public key** (一个很长的 JWT token)
 
-## 第二步：获取 API 密钥
+## 第三步：配置应用
 
-1. **进入项目设置**
-   - 在项目页面，点击左侧菜单的 ⚙️ **Settings**
-   - 选择 **API** 选项
+你的应用已经包含了 Supabase 配置，凭证在：
+`app/src/main/java/com/lipo/menu/data/remote/SupabaseConfig.kt`
 
-2. **记录以下信息**（稍后需要用到）
-   ```
-   Project URL: https://xxxxxx.supabase.co
-   anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-   service_role: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-   ```
+**重要：** 对于家庭使用，当前的配置已经可以工作了。如果你需要使用自己的 Supabase 项目：
 
-   ⚠️ **重要**：
-   - `anon public` 密钥：可以在客户端使用
-   - `service_role` 密钥：**保密！**只能在服务端使用
+1. 打开 `SupabaseConfig.kt`
+2. 替换 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY` 为你的值
+3. **不要** 将这些值提交到公开的 Git 仓库
 
----
-
-## 第三步：创建数据库表结构
-
-1. **打开 SQL Editor**
-   - 在左侧菜单点击 **SQL Editor**
-   - 点击 **New query**
-
-2. **执行建表脚本**
-   - 打开项目中的 `supabase-schema.sql` 文件
-   - 复制所有内容
-   - 粘贴到 SQL Editor 中
-   - 点击 **Run** 按钮（或按 `Ctrl + Enter`）
-
-3. **验证表创建成功**
-   - 在左侧菜单点击 **Table Editor**
-   - 应该看到以下表：
-     - ✅ dishes
-     - ✅ combinations
-     - ✅ combination_dishes
-     - ✅ today_menus
-     - ✅ today_menu_dishes
-
----
-
-## 第四步：测试数据连接（可选）
-
-在 SQL Editor 中执行以下测试：
-
-```sql
--- 测试插入菜品
-INSERT INTO dishes (id, name, description, created_at, updated_at, is_deleted, user_id)
-VALUES (
-  'test-dish-001',
-  '宫保鸡丁',
-  '经典川菜',
-  NOW(),
-  NOW(),
-  false,
-  'default-user'
-);
-
--- 查询验证
-SELECT * FROM dishes WHERE id = 'test-dish-001';
-
--- 清理测试数据
-DELETE FROM dishes WHERE id = 'test-dish-001';
-```
-
----
-
-## 第五步：配置环境变量（为下一步准备）
-
-创建一个临时文件保存配置信息（**不要提交到 Git**）：
+## 第四步：构建并安装应用
 
 ```bash
-# 在项目根目录创建 .env.local 文件（仅用于记录）
-cat > .env.local << 'EOF'
-# Supabase 配置
-SUPABASE_URL=https://xxxxxx.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-EOF
+# 构建应用
+./gradlew assembleDebug
 
-# 添加到 .gitignore（防止泄露）
-echo ".env.local" >> .gitignore
+# APK 文件位置
+app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
+或者从 GitHub Actions 下载最新的 APK。
 
-## ✅ 完成检查清单
+## 第五步：安装到家人手机
 
-- [ ] Supabase 项目已创建
-- [ ] 数据库表结构已创建（5个表）
-- [ ] Row Level Security 已配置
-- [ ] API 密钥已保存
-- [ ] 环境变量文件已创建（.env.local）
+1. 传输 APK 到家人的手机
+2. 在手机上打开 APK 文件
+3. 允许"安装未知来源应用"
+4. 安装完成
 
----
+## 如何工作
+
+- **本地优先**：应用首先保存数据到本地数据库，确保离线也能使用
+- **后台同步**：在后台自动将数据同步到 Supabase
+- **实时更新**：当其他家庭成员添加或修改菜品时，你的手机会自动更新
+- **冲突解决**：使用 `updated_at` 时间戳解决数据冲突
+
+## 故障排查
+
+### 同步不工作
+1. 检查网络连接
+2. 查看 Logcat 中的 "DishRemoteDataSource" 标签
+3. 确认 Supabase 凭证正确
+
+### 数据没有出现在其他设备
+1. 确保两个设备使用相同的 Supabase 项目
+2. 检查 Supabase Dashboard 的 Table Editor 查看数据是否已上传
+3. 重启应用触发数据刷新
+
+## 费用说明
+
+Supabase 免费版包含：
+- 500MB 数据库存储
+- 1GB 文件存储
+- 2GB 带宽/月
+- 无限 API 请求
+
+对于家庭菜单应用，免费版完全足够！
+
+## 安全建议
+
+1. **不要** 将 `SUPABASE_ANON_KEY` 提交到公开仓库
+2. 考虑启用 Row Level Security (RLS) 以增强安全性
+3. 定期在 Supabase Dashboard 备份数据
 
 ## 下一步
 
-完成 Supabase 配置后，下一步是：
-1. 集成 Supabase SDK 到 Android 应用
-2. 实现实时数据同步
-3. 测试数据同步功能
+完成设置后，你的家人可以：
+1. 在各自手机上安装应用
+2. 添加菜品会自动同步到所有人
+3. 每天选择菜单时看到相同的菜品列表
 
----
-
-## 常见问题
-
-### Q1: 为什么 user_id 默认是 'default-user'？
-**A**: 因为当前应用暂时不需要用户认证系统，所有数据都属于一个默认用户。后续添加用户系统时可以迁移数据。
-
-### Q2: Row Level Security 为什么要设置为允许所有访问？
-**A**: 这是开发阶段的临时配置。正式上线前会添加用户认证，届时会更新 RLS 策略。
-
-### Q3: 数据库密码忘记了怎么办？
-**A**: 可以在 Supabase Dashboard → Settings → Database 中重置密码。
-
----
-
-## 参考链接
-
-- [Supabase 官方文档](https://supabase.com/docs)
-- [Supabase Kotlin SDK](https://github.com/supabase-community/supabase-kt)
-- [Row Level Security 指南](https://supabase.com/docs/guides/auth/row-level-security)
+享受共享菜单管理吧！🍽️
