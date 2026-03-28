@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -101,7 +102,10 @@ dependencies {
     implementation(libs.supabase.realtime)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.utils)
+    implementation(libs.kotlinx.serialization.json)
 
     // Testing - Unit
     testImplementation(libs.junit.api)
