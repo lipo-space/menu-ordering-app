@@ -3,18 +3,11 @@ complexity:
     threshold: 100
     ignoreAnnotated: ['Composable']
   LongParameterList:
-    threshold: 10
+    functionThreshold: 10
+    constructorThreshold: 10
     ignoreDefaultParameters: true
 
 style:
   MaxLineLength:
     maxLineLength: 120
     excludeCommentStatements: true
-
-formatting:
-  MaximumLineLength:
-    maxLineLength: 120
-
-exceptions:
-  TooGenericExceptionCaught:
-    enabled: false
