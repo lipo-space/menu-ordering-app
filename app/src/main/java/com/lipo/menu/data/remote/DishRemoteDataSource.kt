@@ -66,17 +66,23 @@ class DishRemoteDataSource @Inject constructor(
             Log.d(TAG, "Fetched ${result.toString().length} bytes of data")
 
             // 解析结果为 Dish 列表
-            result.map { jsonElement ->
-                val json = jsonElement.jsonObject
-                Dish(
-                    id = json["id"]?.jsonPrimitive?.content ?: "",
-                    name = json["name"]?.jsonPrimitive?.content ?: "",
-                    description = json["description"]?.jsonPrimitive?.contentOrNull,
-                    createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
-                    updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
-                    isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
-                )
+            val dishes = mutableListOf<Dish>()
+            result.forEach { jsonElement ->
+                try {
+                    val json = jsonElement.jsonObject
+                    dishes.add(Dish(
+                        id = json["id"]?.jsonPrimitive?.content ?: "",
+                        name = json["name"]?.jsonPrimitive?.content ?: "",
+                        description = json["description"]?.jsonPrimitive?.contentOrNull,
+                        createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
+                        updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
+                        isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
+                    ))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to parse dish: ${e.message}", e)
+                }
             }
+            dishes
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
             throw RemoteDataSourceException("Failed to fetch dishes: ${e.message}", e)

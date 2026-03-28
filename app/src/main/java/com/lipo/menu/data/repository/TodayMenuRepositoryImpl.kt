@@ -5,7 +5,6 @@ import com.lipo.menu.data.local.database.entities.TodayMenuDishEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuWithDishes
 import com.lipo.menu.data.model.TodayMenu
-import com.lipo.menu.data.model.TodayMenuDish
 import com.lipo.menu.data.remote.TodayMenuRemoteDataSource
 import com.lipo.menu.domain.repository.TodayMenuRepository
 import com.lipo.menu.util.DateUtils
@@ -76,6 +75,7 @@ class TodayMenuRepositoryImpl @Inject constructor(
             val todayMenu = TodayMenu(
                 id = menuId,
                 date = date,
+                dishes = emptyList(),
                 createdAt = now,
                 updatedAt = now
             )
@@ -85,12 +85,7 @@ class TodayMenuRepositoryImpl @Inject constructor(
 
             // Add dishes to the menu
             dishIds.forEachIndexed { index, dishId ->
-                val todayMenuDish = TodayMenuDish(
-                    todayMenuId = menuId,
-                    dishId = dishId,
-                    displayOrder = index
-                )
-                remoteDataSource.upsertTodayMenuDish(todayMenuDish)
+                remoteDataSource.upsertTodayMenuDish(menuId, dishId, index)
 
                 todayMenuDao.insertTodayMenuDish(
                     TodayMenuDishEntity(
@@ -113,6 +108,22 @@ class TodayMenuRepositoryImpl @Inject constructor(
         return try {
             val now = DateUtils.getCurrentInstant()
 
+            // 同步到云端
+            val existingMenu = todayMenuDao.getTodayMenuById(id).first()
+            if (existingMenu != null) {
+                val todayMenu = TodayMenu(
+                    id = id,
+                    date = date,
+                    dishes = emptyList(),
+                    createdAt = DateUtils.toInstant(existingMenu.todayMenu.createdAt),
+                    updatedAt = now
+                )
+                remoteDataSource.upsertTodayMenu(todayMenu)
+
+                // 删除云端的旧菜品关联
+                remoteDataSource.deleteTodayMenuDishesByMenu(id)
+            }
+
             todayMenuDao.updateTodayMenu(
                 id = id,
                 date = date.format(dateFormatter),
@@ -122,6 +133,9 @@ class TodayMenuRepositoryImpl @Inject constructor(
             // Delete existing dishes and add new ones
             todayMenuDao.deleteTodayMenuDishesByMenu(id)
             dishIds.forEachIndexed { index, dishId ->
+                // 同步到云端
+                remoteDataSource.upsertTodayMenuDish(id, dishId, index)
+
                 todayMenuDao.insertTodayMenuDish(
                     TodayMenuDishEntity(
                         todayMenuId = id,
@@ -141,6 +155,10 @@ class TodayMenuRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTodayMenu(id: String): Result<Unit> {
         return try {
+            // 同步到云端
+            remoteDataSource.deleteTodayMenuDishesByMenu(id)
+            remoteDataSource.deleteTodayMenu(id)
+
             todayMenuDao.deleteTodayMenu(id)
             Result.success(Unit)
         } catch (e: Exception) {
@@ -150,6 +168,9 @@ class TodayMenuRepositoryImpl @Inject constructor(
 
     override suspend fun addDishToTodayMenu(todayMenuId: String, dishId: String, order: Int): Result<Unit> {
         return try {
+            // 同步到云端
+            remoteDataSource.upsertTodayMenuDish(todayMenuId, dishId, order)
+
             todayMenuDao.insertTodayMenuDish(
                 TodayMenuDishEntity(
                     todayMenuId = todayMenuId,
@@ -165,6 +186,9 @@ class TodayMenuRepositoryImpl @Inject constructor(
 
     override suspend fun removeDishFromTodayMenu(todayMenuId: String, dishId: String): Result<Unit> {
         return try {
+            // 同步到云端
+            remoteDataSource.deleteTodayMenuDish(todayMenuId, dishId)
+
             todayMenuDao.deleteTodayMenuDish(todayMenuId, dishId)
             Result.success(Unit)
         } catch (e: Exception) {

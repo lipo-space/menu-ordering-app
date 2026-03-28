@@ -1,13 +1,13 @@
 package com.lipo.menu.data.remote
 
 import com.lipo.menu.data.model.TodayMenu
-import com.lipo.menu.data.model.TodayMenuDish
 import com.lipo.menu.util.DateUtils
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonObject
 import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,20 +54,20 @@ class TodayMenuRemoteDataSource @Inject constructor(
     /**
      * 同步今日菜单菜品关联到云端
      */
-    suspend fun upsertTodayMenuDish(todayMenuDish: TodayMenuDish): Unit = withContext(Dispatchers.IO) {
+    suspend fun upsertTodayMenuDish(todayMenuId: String, dishId: String, displayOrder: Int): Unit = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Syncing today menu dish to Supabase: ${todayMenuDish.todayMenuId}-${todayMenuDish.dishId}")
+            Log.d(TAG, "Syncing today menu dish to Supabase: $todayMenuId-$dishId")
             client.from("today_menu_dishes").upsert(
                 JsonObject(mapOf(
-                    "today_menu_id" to JsonPrimitive(todayMenuDish.todayMenuId),
-                    "dish_id" to JsonPrimitive(todayMenuDish.dishId),
-                    "display_order" to JsonPrimitive(todayMenuDish.displayOrder)
+                    "today_menu_id" to JsonPrimitive(todayMenuId),
+                    "dish_id" to JsonPrimitive(dishId),
+                    "display_order" to JsonPrimitive(displayOrder)
                 ))
             ) {
                 filter {
                     and {
-                        eq("today_menu_id", todayMenuDish.todayMenuId)
-                        eq("dish_id", todayMenuDish.dishId)
+                        eq("today_menu_id", todayMenuId)
+                        eq("dish_id", dishId)
                     }
                 }
             }
@@ -118,34 +118,20 @@ class TodayMenuRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 从云端获取指定日期的今日菜单
+     * 从云端删除今日菜单的所有菜品关联
      */
-    suspend fun fetchTodayMenuByDate(date: java.time.LocalDate): TodayMenu? = withContext(Dispatchers.IO) {
+    suspend fun deleteTodayMenuDishesByMenu(todayMenuId: String): Unit = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Fetching today menu from Supabase for date: $date")
-            val dateString = DateUtils.formatForStorage(date)
-            val result = client.from("today_menus")
-                .select {
-                    filter {
-                        eq("date", dateString)
-                    }
-                    single()
+            Log.d(TAG, "Deleting all dishes for today menu from Supabase: $todayMenuId")
+            client.from("today_menu_dishes").delete() {
+                filter {
+                    eq("today_menu_id", todayMenuId)
                 }
-
-            if (result != null) {
-                val json = result.jsonObject
-                TodayMenu(
-                    id = json["id"]?.jsonPrimitive?.content ?: "",
-                    date = DateUtils.toLocalDate(json["date"]?.jsonPrimitive?.content?.toLong() ?: 0),
-                    createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
-                    updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: "")
-                )
-            } else {
-                null
             }
+            Log.d(TAG, "Today menu dishes deleted successfully")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to fetch today menu: ${e.message}", e)
-            null
+            Log.e(TAG, "Failed to delete today menu dishes: ${e.message}", e)
+            throw RemoteDataSourceException("Failed to delete today menu dishes: ${e.message}", e)
         }
     }
 }
