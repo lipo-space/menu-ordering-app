@@ -40,16 +40,19 @@ class DishRepositoryImpl @Inject constructor(
 
     override suspend fun addDish(name: String, description: String?): Result<Dish> {
         return try {
+            val trimmedName = name.trim()
+            val trimmedDescription = description?.trim()
+
             // Check for duplicate name
-            if (dishDao.dishNameExists(name)) {
-                return Result.failure(Exception("Dish with name '$name' already exists"))
+            if (dishDao.dishNameExists(trimmedName)) {
+                return Result.failure(Exception("Dish with name '$trimmedName' already exists"))
             }
 
             val now = DateUtils.getCurrentInstant()
             val dish = Dish(
                 id = UUID.randomUUID().toString(),
-                name = name.trim(),
-                description = description?.trim(),
+                name = trimmedName,
+                description = trimmedDescription,
                 createdAt = now,
                 updatedAt = now,
                 isDeleted = false
