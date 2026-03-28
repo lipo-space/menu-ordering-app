@@ -6,6 +6,7 @@ import com.lipo.menu.data.local.database.entities.TodayMenuDishEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuWithDishes
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -131,8 +132,8 @@ class TodayMenuRepositoryTest {
         val dishIds = listOf("d1", "d2")
         val createdEntity = createTodayMenuWithDishes(id = "new-id", date = "2024-03-27")
 
-        coEvery { todayMenuDao.insertTodayMenu(any()) } returns Unit
-        coEvery { todayMenuDao.insertTodayMenuDish(any()) } returns Unit
+        coJustRun { todayMenuDao.insertTodayMenu(any()) }
+        coJustRun { todayMenuDao.insertTodayMenuDish(any()) }
         every { todayMenuDao.getTodayMenuById(any()) } returns flowOf(createdEntity)
 
         // When
@@ -152,9 +153,9 @@ class TodayMenuRepositoryTest {
         val dishIds = listOf("d1", "d2")
         val updatedEntity = createTodayMenuWithDishes(id = id, date = "2024-03-27")
 
-        coEvery { todayMenuDao.updateTodayMenu(id, "2024-03-27", any()) } returns Unit
-        coEvery { todayMenuDao.deleteTodayMenuDishesByMenu(id) } returns Unit
-        coEvery { todayMenuDao.insertTodayMenuDish(any()) } returns Unit
+        coJustRun { todayMenuDao.updateTodayMenu(id, "2024-03-27", any()) }
+        coJustRun { todayMenuDao.deleteTodayMenuDishesByMenu(id) }
+        coJustRun { todayMenuDao.insertTodayMenuDish(any()) }
         every { todayMenuDao.getTodayMenuById(id) } returns flowOf(updatedEntity)
 
         // When
@@ -171,7 +172,7 @@ class TodayMenuRepositoryTest {
     fun deletetodaymenuShouldDeleteMenu() = runTest {
         // Given
         val id = "1"
-        coEvery { todayMenuDao.deleteTodayMenu(id) } returns Unit
+        coJustRun { todayMenuDao.deleteTodayMenu(id) }
 
         // When
         val result = repository.deleteTodayMenu(id)
@@ -187,7 +188,7 @@ class TodayMenuRepositoryTest {
         val menuId = "m1"
         val dishId = "d1"
         val order = 0
-        coEvery { todayMenuDao.insertTodayMenuDish(any()) } returns Unit
+        coJustRun { todayMenuDao.insertTodayMenuDish(any()) }
 
         // When
         val result = repository.addDishToTodayMenu(menuId, dishId, order)
@@ -206,7 +207,7 @@ class TodayMenuRepositoryTest {
         // Given
         val menuId = "m1"
         val dishId = "d1"
-        coEvery { todayMenuDao.deleteTodayMenuDish(menuId, dishId) } returns Unit
+        coJustRun { todayMenuDao.deleteTodayMenuDish(menuId, dishId) }
 
         // When
         val result = repository.removeDishFromTodayMenu(menuId, dishId)
