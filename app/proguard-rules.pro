@@ -57,8 +57,12 @@
 }
 
 # Supabase
--keep class io.github.jan.tennert.supabase.** { *; }
--dontwarn io.github.jan.tennert.supabase.**
+-keep class io.github.jan.supabase.** { *; }
+-dontwarn io.github.jan.supabase.**
+
+# SLF4J Logging (used by Supabase and Ktor)
+-keep class org.slf4j.** { *; }
+-dontwarn org.slf4j.**
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
