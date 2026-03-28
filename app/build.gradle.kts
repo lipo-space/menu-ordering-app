@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
@@ -10,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.lipo.menu"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.lipo.menu"
@@ -97,15 +96,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     // Supabase - 云端数据库同步
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.4.0"))
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
-    implementation("io.github.jan-tennert.supabase:realtime-kt")
-    implementation("io.ktor:ktor-client-android:3.0.1")
-    implementation("io.ktor:ktor-client-core:3.0.1")
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.1")
-    implementation("io.ktor:ktor-utils:3.0.1")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.1.5")
+    implementation("io.github.jan-tennert.supabase:auth-kt:2.1.5")
+    implementation("io.github.jan-tennert.supabase:realtime-kt:2.1.5")
+    implementation("io.ktor:ktor-client-android:2.3.11")
+    implementation("io.ktor:ktor-client-core:2.3.11")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+    implementation("io.ktor:ktor-utils:2.3.11")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Testing - Unit

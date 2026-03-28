@@ -1,6 +1,6 @@
 [versions]
-agp = "8.9.1"
-kotlin = "2.0.21"
+agp = "8.4.1"
+kotlin = "1.9.22"
 coreKtx = "1.12.0"
 junit = "4.13.2"
 junitJupiter = "5.10.0"
@@ -18,9 +18,9 @@ coroutines = "1.8.0"
 mockk = "1.13.9"
 turbine = "1.0.0"
 detekt = "1.23.4"
-ksp = "2.0.21-1.0.28"
+ksp = "1.9.22-1.0.17"
 supabase = "2.1.5"
-ktor = "3.0.1"
+ktor = "2.3.11"
 jsonSerialization = "1.6.3"
 
 [libraries]
@@ -87,7 +87,6 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
