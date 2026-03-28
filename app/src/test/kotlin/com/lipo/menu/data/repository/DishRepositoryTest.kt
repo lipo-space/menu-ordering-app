@@ -5,6 +5,7 @@ import com.lipo.menu.data.local.database.entities.DishEntity
 import com.lipo.menu.data.model.Dish
 import com.lipo.menu.data.remote.DishRemoteDataSource
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
