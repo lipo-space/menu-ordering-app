@@ -5,6 +5,8 @@ import com.lipo.menu.data.local.database.entities.TodayMenuDishEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuEntity
 import com.lipo.menu.data.local.database.entities.TodayMenuWithDishes
 import com.lipo.menu.data.model.TodayMenu
+import com.lipo.menu.data.model.TodayMenuDish
+import com.lipo.menu.data.remote.TodayMenuRemoteDataSource
 import com.lipo.menu.domain.repository.TodayMenuRepository
 import com.lipo.menu.util.DateUtils
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +20,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TodayMenuRepositoryImpl @Inject constructor(
-    private val todayMenuDao: TodayMenuDao
+    private val todayMenuDao: TodayMenuDao,
+    private val remoteDataSource: TodayMenuRemoteDataSource  // 启用云端同步
 ) : TodayMenuRepository {
 
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
@@ -69,10 +72,26 @@ class TodayMenuRepositoryImpl @Inject constructor(
                 updatedAt = DateUtils.toEpochMilli(now)
             )
 
+            // 同步到云端
+            val todayMenu = TodayMenu(
+                id = menuId,
+                date = date,
+                createdAt = now,
+                updatedAt = now
+            )
+            remoteDataSource.upsertTodayMenu(todayMenu)
+
             todayMenuDao.insertTodayMenu(todayMenuEntity)
 
             // Add dishes to the menu
             dishIds.forEachIndexed { index, dishId ->
+                val todayMenuDish = TodayMenuDish(
+                    todayMenuId = menuId,
+                    dishId = dishId,
+                    displayOrder = index
+                )
+                remoteDataSource.upsertTodayMenuDish(todayMenuDish)
+
                 todayMenuDao.insertTodayMenuDish(
                     TodayMenuDishEntity(
                         todayMenuId = menuId,

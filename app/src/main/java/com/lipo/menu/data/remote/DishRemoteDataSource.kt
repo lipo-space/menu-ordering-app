@@ -26,7 +26,7 @@ class DishRemoteDataSource @Inject constructor(
     /**
      * 同步菜品到云端
      */
-    suspend fun upsertDish(dish: Dish) = withContext(Dispatchers.IO) {
+    suspend fun upsertDish(dish: Dish): Unit = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "Syncing dish to Supabase: ${dish.name}")
             client.from("dishes").upsert(
@@ -39,12 +39,15 @@ class DishRemoteDataSource @Inject constructor(
                     "is_deleted" to JsonPrimitive(dish.isDeleted),
                     "user_id" to JsonPrimitive("default-user")
                 ))
-            )
+            ) {
+                filter {
+                    eq("id", dish.id)
+                }
+            }
             Log.d(TAG, "Dish synced successfully: ${dish.name}")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to sync dish: ${e.message}", e)
-            // 暂时不抛出异常，让应用继续运行
-            // throw RemoteDataSourceException("Failed to upsert dish: ${e.message}", e)
+            throw RemoteDataSourceException("Failed to upsert dish: ${e.message}", e)
         }
     }
 
@@ -61,19 +64,29 @@ class DishRemoteDataSource @Inject constructor(
                     }
                 }
             Log.d(TAG, "Fetched ${result.toString().length} bytes of data")
-            // TODO: 解析结果为 Dish 列表
-            emptyList()
+
+            // 解析结果为 Dish 列表
+            result.map { jsonElement ->
+                val json = jsonElement.jsonObject
+                Dish(
+                    id = json["id"]?.jsonPrimitive?.content ?: "",
+                    name = json["name"]?.jsonPrimitive?.content ?: "",
+                    description = json["description"]?.jsonPrimitive?.contentOrNull,
+                    createdAt = DateUtils.parseISO8601(json["created_at"]?.jsonPrimitive?.content ?: ""),
+                    updatedAt = DateUtils.parseISO8601(json["updated_at"]?.jsonPrimitive?.content ?: ""),
+                    isDeleted = json["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
+                )
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
-            // 暂时返回空列表，让应用继续运行
-            emptyList()
+            throw RemoteDataSourceException("Failed to fetch dishes: ${e.message}", e)
         }
     }
 
     /**
      * 从云端删除菜品（软删除）
      */
-    suspend fun deleteDish(dishId: String) = withContext(Dispatchers.IO) {
+    suspend fun deleteDish(dishId: String): Unit = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "Deleting dish from Supabase: $dishId")
             client.from("dishes").update(
@@ -89,8 +102,7 @@ class DishRemoteDataSource @Inject constructor(
             Log.d(TAG, "Dish deleted successfully: $dishId")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to delete dish: ${e.message}", e)
-            // 暂时不抛出异常，让应用继续运行
-            // throw RemoteDataSourceException("Failed to delete dish: ${e.message}", e)
+            throw RemoteDataSourceException("Failed to delete dish: ${e.message}", e)
         }
     }
 }
