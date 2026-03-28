@@ -117,8 +117,8 @@ class DishRepositoryTest {
         val name = "New Dish"
         val description = "Description"
         coEvery { dishDao.dishNameExists(name, null) } returns false
-        coEvery { dishDao.insertDish(any()) } returns Unit
-        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
+        coJustRun { dishDao.insertDish(any()) }
+        coJustRun { remoteDataSource.upsertDish(any()) }
 
         // When
         val result = repository.addDish(name, description)
@@ -152,8 +152,8 @@ class DishRepositoryTest {
         val name = "  Dish Name  "
         val description = "  Description  "
         coEvery { dishDao.dishNameExists("Dish Name", null) } returns false
-        coEvery { dishDao.insertDish(any()) } returns Unit
-        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
+        coJustRun { dishDao.insertDish(any()) }
+        coJustRun { remoteDataSource.upsertDish(any()) }
 
         // When
         val result = repository.addDish(name, description)
@@ -174,8 +174,8 @@ class DishRepositoryTest {
 
         coEvery { dishDao.dishNameExists(name, id) } returns false
         coEvery { dishDao.getDishByIdSync(id) } returns existingEntity
-        coEvery { dishDao.updateDish(any()) } returns Unit
-        coEvery { remoteDataSource.upsertDish(any()) } returns Unit
+        coJustRun { dishDao.updateDish(any()) }
+        coJustRun { remoteDataSource.upsertDish(any()) }
 
         // When
         val result = repository.updateDish(id, name, description)
@@ -225,8 +225,8 @@ class DishRepositoryTest {
     fun deletedishWithValidIdShouldSucceed() = runTest {
         // Given
         val id = "1"
-        coEvery { dishDao.softDeleteDish(eq(id), any()) } returns Unit
-        coEvery { remoteDataSource.deleteDish(id) } returns Unit
+        coJustRun { dishDao.softDeleteDish(eq(id), any()) }
+        coJustRun { remoteDataSource.deleteDish(id) }
 
         // When
         val result = repository.deleteDish(id)
