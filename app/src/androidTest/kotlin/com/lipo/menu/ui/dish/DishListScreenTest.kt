@@ -1,5 +1,6 @@
 package com.lipo.menu.ui.dish
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasNoClickAction
 import androidx.compose.ui.test.hasText
