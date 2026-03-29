@@ -2,7 +2,7 @@
 
 ## ✅ 已完成的修复
 
-### 1. 修复编译错误
+### 1. 修复 isNull 编译错误
 **问题：** `Unresolved reference: isNull`
 
 **原因：** Supabase-kt 2.x 的 filter DSL 不支持 `isNull()` 函数
@@ -25,7 +25,37 @@ filter {
 
 **提交记录：** `96f1fdf` - docs: 添加 Supabase 快速修复指南
 
-### 2. 已推送到 GitHub
+### 2. 修复 UpsertOptions 编译错误 ✅ 新修复
+**问题：** `Unresolved reference: UpsertOptions`
+
+**原因：** Supabase-kt 2.x 不使用 `UpsertOptions` 类，`onConflict` 应该作为 `upsert()` 函数的直接参数
+
+**解决方案：**
+```kotlin
+// 之前的代码（错误）
+import io.github.jan.supabase.postgrest.UpsertOptions  // ❌ 不存在
+
+client.from("dishes").upsert(
+    JsonObject(...),
+    upsertOptions = UpsertOptions(onConflict = "id")  // ❌ 错误
+)
+
+// 修复后的代码（正确）
+// 移除 UpsertOptions 导入
+
+client.from("dishes").upsert(
+    JsonObject(...),
+    onConflict = "id"  // ✅ 正确
+)
+```
+
+**同时修复的问题：**
+- ✅ today_menus 重复键错误（使用 `onConflict = "date"`）
+- ✅ today_menu_dishes 复合主键冲突（使用 `onConflict = "today_menu_id,dish_id"`）
+
+**提交记录：** `5258fc2` - fix: 修复 UpsertOptions 编译错误
+
+### 3. 已推送到 GitHub
 代码已推送到 `main` 分支，GitHub Actions 正在自动构建新的 APK。
 
 ---
