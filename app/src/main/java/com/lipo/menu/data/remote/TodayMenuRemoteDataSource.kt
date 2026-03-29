@@ -3,7 +3,6 @@ package com.lipo.menu.data.remote
 import com.lipo.menu.data.model.TodayMenu
 import com.lipo.menu.util.DateUtils
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.UpsertOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
@@ -39,9 +38,7 @@ class TodayMenuRemoteDataSource @Inject constructor(
                     "updated_at" to JsonPrimitive(DateUtils.toISO8601(todayMenu.updatedAt)),
                     "user_id" to JsonPrimitive("default-user")
                 )),
-                upsertOptions = UpsertOptions(
-                    onConflict = "date"
-                )
+                onConflict = "date"
             )
             Log.d(TAG, "Today menu synced successfully: ${todayMenu.id}")
         } catch (e: Exception) {
@@ -63,9 +60,7 @@ class TodayMenuRemoteDataSource @Inject constructor(
                     "dish_id" to JsonPrimitive(dishId),
                     "display_order" to JsonPrimitive(displayOrder)
                 )),
-                upsertOptions = UpsertOptions(
-                    onConflict = "today_menu_id,dish_id"
-                )
+                onConflict = "today_menu_id,dish_id"
             )
             Log.d(TAG, "Today menu dish synced successfully")
         } catch (e: Exception) {
