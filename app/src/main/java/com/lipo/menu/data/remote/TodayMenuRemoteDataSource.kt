@@ -125,4 +125,91 @@ class TodayMenuRemoteDataSource @Inject constructor(
             throw RemoteDataSourceException("Failed to delete today menu dishes: ${e.message}", e)
         }
     }
+
+    /**
+     * 从云端获取所有今日菜单
+     */
+    suspend fun fetchAllTodayMenus(): List<Map<String, Any>> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Fetching all today menus from Supabase")
+            val result = client.from("today_menus").select()
+            Log.d(TAG, "Fetched today menus successfully")
+
+            val menus = mutableListOf<Map<String, Any>>()
+            val resultString = result.toString()
+
+            try {
+                val jsonArray = kotlinx.serialization.json.Json.parseToJsonElement(resultString)
+                if (jsonArray is kotlinx.serialization.json.JsonArray) {
+                    jsonArray.forEach { element ->
+                        try {
+                            val obj = element.jsonObject
+                            val menuMap = mapOf(
+                                "id" to (obj["id"]?.jsonPrimitive?.content ?: ""),
+                                "date" to (obj["date"]?.jsonPrimitive?.content ?: ""),
+                                "created_at" to (obj["created_at"]?.jsonPrimitive?.content ?: ""),
+                                "updated_at" to (obj["updated_at"]?.jsonPrimitive?.content ?: "")
+                            )
+                            if (menuMap["id"].isNotEmpty() && menuMap["date"].isNotEmpty()) {
+                                menus.add(menuMap)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to parse today menu element: ${e.message}")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse JSON array: ${e.message}")
+            }
+
+            Log.d(TAG, "Parsed ${menus.size} today menus from Supabase")
+            menus
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch today menus: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * 从云端获取所有今日菜单菜品关联
+     */
+    suspend fun fetchAllTodayMenuDishes(): List<Map<String, Any>> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Fetching all today menu dishes from Supabase")
+            val result = client.from("today_menu_dishes").select()
+            Log.d(TAG, "Fetched today menu dishes successfully")
+
+            val dishes = mutableListOf<Map<String, Any>>()
+            val resultString = result.toString()
+
+            try {
+                val jsonArray = kotlinx.serialization.json.Json.parseToJsonElement(resultString)
+                if (jsonArray is kotlinx.serialization.json.JsonArray) {
+                    jsonArray.forEach { element ->
+                        try {
+                            val obj = element.jsonObject
+                            val dishMap = mapOf(
+                                "today_menu_id" to (obj["today_menu_id"]?.jsonPrimitive?.content ?: ""),
+                                "dish_id" to (obj["dish_id"]?.jsonPrimitive?.content ?: ""),
+                                "display_order" to (obj["display_order"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0)
+                            )
+                            if (dishMap["today_menu_id"].isNotEmpty() && dishMap["dish_id"].isNotEmpty()) {
+                                dishes.add(dishMap)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to parse today menu dish element: ${e.message}")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse JSON array: ${e.message}")
+            }
+
+            Log.d(TAG, "Parsed ${dishes.size} today menu dishes from Supabase")
+            dishes
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch today menu dishes: ${e.message}", e)
+            emptyList()
+        }
+    }
 }

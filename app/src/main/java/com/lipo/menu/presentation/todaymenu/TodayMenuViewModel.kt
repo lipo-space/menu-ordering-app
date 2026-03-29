@@ -50,13 +50,23 @@ class TodayMenuViewModel @Inject constructor(
     private val removeDishFromTodayMenuUseCase: RemoveDishFromTodayMenuUseCase,
     private val clearTodayMenuUseCase: ClearTodayMenuUseCase,
     private val getAllDishesUseCase: GetAllDishesUseCase,
-    private val getAllCombinationsUseCase: GetAllCombinationsUseCase
+    private val getAllCombinationsUseCase: GetAllCombinationsUseCase,
+    private val todayMenuRepository: com.lipo.menu.data.repository.TodayMenuRepositoryImpl
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TodayMenuUiState())
     val uiState: StateFlow<TodayMenuUiState> = _uiState.asStateFlow()
 
     init {
+        // 先从云端同步数据
+        viewModelScope.launch {
+            try {
+                todayMenuRepository.syncFromCloud()
+            } catch (e: Exception) {
+                // 同步失败不影响本地数据显示
+                android.util.Log.e("TodayMenuViewModel", "Failed to sync from cloud: ${e.message}")
+            }
+        }
         loadTodayMenu()
         loadAllDishes()
         loadAllCombinations()

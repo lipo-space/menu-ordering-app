@@ -28,13 +28,95 @@ class TodayMenuRepositoryImpl @Inject constructor(
 
     /**
      * 从云端同步数据到本地数据库
-     * 暂时不实现，因为今日菜单同步比较复杂
+     * 同步 today_menus 和 today_menu_dishes 两张表
      */
     suspend fun syncFromCloud() {
-        // 今日菜单同步比较复杂，暂时不实现
-        // 因为需要同步 today_menus 和 today_menu_dishes 两张表
-        // 并且需要处理关联关系
-        Log.d("TodayMenuRepository", "Today menu sync is not implemented yet")
+        try {
+            Log.d("TodayMenuRepository", "Starting sync from cloud")
+
+            // 1. 同步今日菜单
+            val cloudMenus = remoteDataSource.fetchAllTodayMenus()
+            cloudMenus.forEach { menuMap ->
+                try {
+                    val menuId = menuMap["id"] as String
+                    val menuDate = menuMap["date"] as String
+                    val createdAt = menuMap["created_at"] as String
+                    val updatedAt = menuMap["updated_at"] as String
+
+                    // 检查本地是否已存在
+                    val localMenu = todayMenuDao.getTodayMenuByIdSync(menuId)
+
+                    if (localMenu == null) {
+                        // 本地不存在，插入
+                        val entity = TodayMenuEntity(
+                            id = menuId,
+                            date = menuDate,
+                            createdAt = DateUtils.parseISO8601(createdAt).toEpochMilli(),
+                            updatedAt = DateUtils.parseISO8601(updatedAt).toEpochMilli()
+                        )
+                        todayMenuDao.insertTodayMenu(entity)
+                        Log.d("TodayMenuRepository", "Inserted today menu from cloud: $menuDate")
+                    } else {
+                        // 本地已存在，比较更新时间
+                        if (DateUtils.parseISO8601(updatedAt).isAfter(
+                                DateUtils.toInstant(localMenu.updatedAt)
+                            )) {
+                            val entity = TodayMenuEntity(
+                                id = menuId,
+                                date = menuDate,
+                                createdAt = DateUtils.parseISO8601(createdAt).toEpochMilli(),
+                                updatedAt = DateUtils.parseISO8601(updatedAt).toEpochMilli()
+                            )
+                            todayMenuDao.updateTodayMenu(entity)
+                            Log.d("TodayMenuRepository", "Updated today menu from cloud: $menuDate")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("TodayMenuRepository", "Failed to sync today menu: ${e.message}")
+                }
+            }
+
+            // 2. 同步今日菜单菜品关联
+            val cloudDishes = remoteDataSource.fetchAllTodayMenuDishes()
+            cloudDishes.forEach { dishMap ->
+                try {
+                    val todayMenuId = dishMap["today_menu_id"] as String
+                    val dishId = dishMap["dish_id"] as String
+                    val displayOrder = dishMap["display_order"] as Int
+
+                    // 检查本地是否已存在
+                    val localDish = todayMenuDao.getTodayMenuDishByIdsSync(todayMenuId, dishId)
+
+                    if (localDish == null) {
+                        // 本地不存在，插入
+                        val entity = TodayMenuDishEntity(
+                            todayMenuId = todayMenuId,
+                            dishId = dishId,
+                            displayOrder = displayOrder
+                        )
+                        todayMenuDao.insertTodayMenuDish(entity)
+                        Log.d("TodayMenuRepository", "Inserted today menu dish from cloud: $todayMenuId-$dishId")
+                    } else {
+                        // 本地已存在，更新 display_order
+                        if (displayOrder != localDish.displayOrder) {
+                            val entity = TodayMenuDishEntity(
+                                todayMenuId = todayMenuId,
+                                dishId = dishId,
+                                displayOrder = displayOrder
+                            )
+                            todayMenuDao.updateTodayMenuDish(entity)
+                            Log.d("TodayMenuRepository", "Updated today menu dish from cloud: $todayMenuId-$dishId")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("TodayMenuRepository", "Failed to sync today menu dish: ${e.message}")
+                }
+            }
+
+            Log.d("TodayMenuRepository", "Sync completed. Synced ${cloudMenus.size} menus and ${cloudDishes.size} dishes")
+        } catch (e: Exception) {
+            Log.e("TodayMenuRepository", "Failed to sync from cloud: ${e.message}")
+        }
     }
 
     override fun getTodayMenu(date: LocalDate): Flow<TodayMenu?> {
