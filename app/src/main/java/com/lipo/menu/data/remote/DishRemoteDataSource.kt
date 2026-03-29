@@ -67,10 +67,7 @@ class DishRemoteDataSource @Inject constructor(
             val result = client.from("dishes")
                 .select {
                     filter {
-                        or {
-                            eq("is_deleted", false)
-                            isNull("is_deleted")
-                        }
+                        eq("is_deleted", false)
                     }
                 }
             Log.d(TAG, "Fetched dishes successfully. Result: ${result.toString().take(200)}")
