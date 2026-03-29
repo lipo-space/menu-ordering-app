@@ -226,16 +226,16 @@ class DishRepositoryTest {
     fun deletedishWithValidIdShouldSucceed() = runTest {
         // Given
         val id = "1"
+        coEvery { remoteDataSource.deleteDish(id) } returns Unit
         coJustRun { dishDao.softDeleteDish(eq(id), any()) }
-        coJustRun { remoteDataSource.deleteDish(id) }
 
         // When
         val result = repository.deleteDish(id)
 
         // Then
         assertTrue(result.isSuccess)
-        coVerify { dishDao.softDeleteDish(eq(id), any()) }
         coVerify { remoteDataSource.deleteDish(id) }
+        coVerify { dishDao.softDeleteDish(eq(id), any()) }
     }
 
     @Test
