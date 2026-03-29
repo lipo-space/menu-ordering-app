@@ -42,6 +42,7 @@ class TodayMenuViewModelTest {
     private lateinit var clearTodayMenuUseCase: ClearTodayMenuUseCase
     private lateinit var getAllDishesUseCase: GetAllDishesUseCase
     private lateinit var getAllCombinationsUseCase: GetAllCombinationsUseCase
+    private lateinit var todayMenuRepository: com.lipo.menu.data.repository.TodayMenuRepositoryImpl
     private lateinit var viewModel: TodayMenuViewModel
 
     private val testDispatcher = StandardTestDispatcher()
@@ -59,6 +60,7 @@ class TodayMenuViewModelTest {
         clearTodayMenuUseCase = mockk()
         getAllDishesUseCase = mockk()
         getAllCombinationsUseCase = mockk()
+        todayMenuRepository = mockk(relaxed = true)
 
         // Setup default behavior for flows
         coEvery { getTodayMenuUseCase.invoke() } returns flowOf(null)
@@ -74,7 +76,8 @@ class TodayMenuViewModelTest {
             removeDishFromTodayMenuUseCase,
             clearTodayMenuUseCase,
             getAllDishesUseCase,
-            getAllCombinationsUseCase
+            getAllCombinationsUseCase,
+            todayMenuRepository
         )
     }
 
