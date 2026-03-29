@@ -9,6 +9,7 @@ import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -226,6 +227,13 @@ class DishRepositoryTest {
     fun deletedishWithValidIdShouldSucceed() = runTest {
         // Given
         val id = "1"
+
+        // Mock Log to avoid issues in tests
+        mockkStatic(android.util.Log::class)
+        every { android.util.Log.d(any(), any()) } returns 0
+        every { android.util.Log.e(any(), any()) } returns 0
+        every { android.util.Log.e(any(), any(), any()) } returns 0
+
         coEvery { remoteDataSource.deleteDish(id) } returns Unit
         coJustRun { dishDao.softDeleteDish(eq(id), any()) }
 
