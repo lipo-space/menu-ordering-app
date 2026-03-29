@@ -61,13 +61,11 @@ class TodayMenuRepositoryImpl @Inject constructor(
                         if (DateUtils.parseISO8601(updatedAt).isAfter(
                                 DateUtils.toInstant(localMenu.updatedAt)
                             )) {
-                            val entity = TodayMenuEntity(
+                            todayMenuDao.updateTodayMenu(
                                 id = menuId,
                                 date = menuDate,
-                                createdAt = DateUtils.parseISO8601(createdAt).toEpochMilli(),
                                 updatedAt = DateUtils.parseISO8601(updatedAt).toEpochMilli()
                             )
-                            todayMenuDao.updateTodayMenu(entity)
                             Log.d("TodayMenuRepository", "Updated today menu from cloud: $menuDate")
                         }
                     }
@@ -80,9 +78,9 @@ class TodayMenuRepositoryImpl @Inject constructor(
             val cloudDishes = remoteDataSource.fetchAllTodayMenuDishes()
             cloudDishes.forEach { dishMap ->
                 try {
-                    val todayMenuId = dishMap["today_menu_id"] as String
-                    val dishId = dishMap["dish_id"] as String
-                    val displayOrder = dishMap["display_order"] as Int
+                    val todayMenuId = dishMap["today_menu_id"] as? String ?: return@forEach
+                    val dishId = dishMap["dish_id"] as? String ?: return@forEach
+                    val displayOrder = (dishMap["display_order"] as? Number)?.toInt() ?: 0
 
                     // 检查本地是否已存在
                     val localDish = todayMenuDao.getTodayMenuDishByIdsSync(todayMenuId, dishId)
