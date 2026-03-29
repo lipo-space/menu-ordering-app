@@ -41,7 +41,8 @@ class DishListViewModel @Inject constructor(
     private val searchDishesUseCase: SearchDishesUseCase,
     private val addDishUseCase: AddDishUseCase,
     private val updateDishUseCase: UpdateDishUseCase,
-    private val deleteDishUseCase: DeleteDishUseCase
+    private val deleteDishUseCase: DeleteDishUseCase,
+    private val dishRepository: com.lipo.menu.data.repository.DishRepositoryImpl
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DishListUiState())
@@ -50,6 +51,15 @@ class DishListViewModel @Inject constructor(
     private val searchQuery = MutableStateFlow("")
 
     init {
+        // 先从云端同步数据，然后加载本地数据
+        viewModelScope.launch {
+            try {
+                dishRepository.syncFromCloud()
+            } catch (e: Exception) {
+                // 同步失败不影响本地数据显示
+                android.util.Log.e("DishListViewModel", "Failed to sync from cloud: ${e.message}")
+            }
+        }
         loadDishes()
     }
 
