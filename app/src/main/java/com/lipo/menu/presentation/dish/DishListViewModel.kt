@@ -176,15 +176,20 @@ class DishListViewModel @Inject constructor(
 
     fun deleteDish(id: String) {
         viewModelScope.launch {
+            Log.d("DishListViewModel", "=== User triggered delete dish ===")
+            Log.d("DishListViewModel", "Dish ID: $id")
+
             _uiState.update { it.copy(isLoading = true) }
 
             deleteDishUseCase(id)
                 .onSuccess {
+                    Log.d("DishListViewModel", "✓ Delete dish succeeded")
                     _uiState.update {
                         it.hideDeleteDialog().copy(isLoading = false, error = null)
                     }
                 }
                 .onFailure { error ->
+                    Log.e("DishListViewModel", "✗ Delete dish failed: ${error.message}", error)
                     _uiState.update {
                         it.copy(
                             isLoading = false,

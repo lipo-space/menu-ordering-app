@@ -149,20 +149,30 @@ class DishRemoteDataSource @Inject constructor(
      */
     suspend fun deleteDish(dishId: String): Unit = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Deleting dish from Supabase: $dishId")
-            client.from("dishes").update(
-                JsonObject(mapOf(
-                    "is_deleted" to JsonPrimitive(true),
-                    "updated_at" to JsonPrimitive(DateUtils.toISO8601(DateUtils.getCurrentInstant()))
-                ))
-            ) {
+            Log.d(TAG, "=== Starting to delete dish from Supabase ===")
+            Log.d(TAG, "Dish ID: $dishId")
+
+            val updateData = JsonObject(mapOf(
+                "is_deleted" to JsonPrimitive(true),
+                "updated_at" to JsonPrimitive(DateUtils.toISO8601(DateUtils.getCurrentInstant()))
+            ))
+            Log.d(TAG, "Update data: $updateData")
+
+            client.from("dishes").update(updateData) {
                 filter {
                     eq("id", dishId)
                 }
             }
-            Log.d(TAG, "Dish deleted successfully: $dishId")
+
+            Log.d(TAG, "=== Dish deleted successfully in Supabase ===")
+            Log.d(TAG, "Dish ID: $dishId")
+            Log.d(TAG, "is_deleted set to: true")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to delete dish: ${e.message}", e)
+            Log.e(TAG, "=== CRITICAL ERROR deleting dish ===", e)
+            Log.e(TAG, "Dish ID: $dishId")
+            Log.e(TAG, "Error type: ${e::class.simpleName}")
+            Log.e(TAG, "Error message: ${e.message}")
+            e.printStackTrace()
             throw RemoteDataSourceException("Failed to delete dish: ${e.message}", e)
         }
     }

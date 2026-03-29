@@ -153,14 +153,27 @@ class DishRepositoryImpl @Inject constructor(
 
     override suspend fun deleteDish(id: String): Result<Unit> {
         return try {
+            Log.d("DishRepository", "=== Starting delete dish ===")
+            Log.d("DishRepository", "Dish ID: $id")
+
             // 同步到云端
+            Log.d("DishRepository", "Step 1: Syncing to cloud...")
             remoteDataSource.deleteDish(id)
+            Log.d("DishRepository", "✓ Successfully synced to cloud")
 
             // 删除本地数据
+            Log.d("DishRepository", "Step 2: Deleting from local database...")
             dishDao.softDeleteDish(id, DateUtils.getCurrentEpochMilli())
+            Log.d("DishRepository", "✓ Successfully deleted from local database")
 
+            Log.d("DishRepository", "=== Delete dish completed successfully ===")
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("DishRepository", "=== FAILED to delete dish ===", e)
+            Log.e("DishRepository", "Dish ID: $id")
+            Log.e("DishRepository", "Error type: ${e::class.simpleName}")
+            Log.e("DishRepository", "Error message: ${e.message}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }
