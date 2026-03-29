@@ -67,10 +67,13 @@ class DishRemoteDataSource @Inject constructor(
             val result = client.from("dishes")
                 .select {
                     filter {
-                        eq("is_deleted", false)
+                        or {
+                            eq("is_deleted", false)
+                            isNull("is_deleted")
+                        }
                     }
                 }
-            Log.d(TAG, "Fetched dishes successfully")
+            Log.d(TAG, "Fetched dishes successfully. Result: ${result.toString().take(200)}")
 
             // 解析 JSON 数据
             val dishes = mutableListOf<Dish>()
