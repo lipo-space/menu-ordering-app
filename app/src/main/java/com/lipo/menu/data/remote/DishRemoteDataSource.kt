@@ -60,54 +60,86 @@ class DishRemoteDataSource @Inject constructor(
      */
     suspend fun fetchAllDishes(): List<Dish> = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Fetching dishes from Supabase")
+            Log.d(TAG, "=== Starting to fetch dishes from Supabase ===")
+            Log.d(TAG, "Client initialized: ${client != null}")
+
             val result = client.from("dishes")
                 .select {
                     filter {
                         eq("is_deleted", false)
                     }
                 }
-            Log.d(TAG, "Fetched dishes successfully. Result: ${result.toString().take(200)}")
+
+            val resultString = result.toString()
+            Log.d(TAG, "=== Raw result from Supabase ===")
+            Log.d(TAG, "Result length: ${resultString.length}")
+            Log.d(TAG, "Result preview: ${resultString.take(500)}")
 
             // 解析 JSON 数据
             val dishes = mutableListOf<Dish>()
-            val resultString = result.toString()
 
-            // supabase-kt 2.x 返回的数据需要手动解析
-            // 使用正则表达式提取数据（简单方法）
-            val pattern = """id=([^,}]+),.*?name=([^,}]+),.*?description=([^,}]*),.*?created_at=([^,}]+),.*?updated_at=([^,}]+)""".toRegex(RegexOption.DOT_MATCHES_ALL)
-
-            // 更安全的方式：直接使用 kotlinx.serialization
             try {
                 val jsonArray = kotlinx.serialization.json.Json.parseToJsonElement(resultString)
+                Log.d(TAG, "Parsed JSON type: ${jsonArray::class.simpleName}")
+
                 if (jsonArray is kotlinx.serialization.json.JsonArray) {
-                    jsonArray.forEach { element ->
+                    Log.d(TAG, "Array size: ${jsonArray.size}")
+
+                    jsonArray.forEachIndexed { index, element ->
                         try {
+                            Log.d(TAG, "Processing element $index")
                             val obj = element.jsonObject
-                            val dish = Dish(
-                                id = obj["id"]?.jsonPrimitive?.content ?: "",
-                                name = obj["name"]?.jsonPrimitive?.content ?: "",
-                                description = obj["description"]?.jsonPrimitive?.contentOrNull,
-                                createdAt = DateUtils.parseISO8601(obj["created_at"]?.jsonPrimitive?.content ?: Instant.now().toString()),
-                                updatedAt = DateUtils.parseISO8601(obj["updated_at"]?.jsonPrimitive?.content ?: Instant.now().toString()),
-                                isDeleted = obj["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
-                            )
-                            if (dish.id.isNotEmpty() && dish.name.isNotEmpty()) {
+
+                            val id = obj["id"]?.jsonPrimitive?.content ?: ""
+                            val name = obj["name"]?.jsonPrimitive?.content ?: ""
+                            val description = obj["description"]?.jsonPrimitive?.contentOrNull
+                            val createdAtStr = obj["created_at"]?.jsonPrimitive?.content ?: ""
+                            val updatedAtStr = obj["updated_at"]?.jsonPrimitive?.content ?: ""
+                            val isDeleted = obj["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
+
+                            Log.d(TAG, "  Dish $index: id=$id, name=$name, description=$description")
+
+                            if (id.isNotEmpty() && name.isNotEmpty()) {
+                                val dish = Dish(
+                                    id = id,
+                                    name = name,
+                                    description = description,
+                                    createdAt = if (createdAtStr.isNotEmpty()) {
+                                        DateUtils.parseISO8601(createdAtStr)
+                                    } else {
+                                        Instant.now()
+                                    },
+                                    updatedAt = if (updatedAtStr.isNotEmpty()) {
+                                        DateUtils.parseISO8601(updatedAtStr)
+                                    } else {
+                                        Instant.now()
+                                    },
+                                    isDeleted = isDeleted
+                                )
                                 dishes.add(dish)
+                                Log.d(TAG, "  Successfully added dish: $name")
+                            } else {
+                                Log.w(TAG, "  Skipped dish with empty id or name")
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Failed to parse dish element: ${e.message}")
+                            Log.e(TAG, "Failed to parse dish element $index: ${e.message}", e)
                         }
                     }
+                } else {
+                    Log.e(TAG, "Result is not a JSON array! Type: ${jsonArray::class.simpleName}")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to parse JSON array: ${e.message}")
+                Log.e(TAG, "Failed to parse JSON: ${e.message}", e)
+                Log.e(TAG, "Result string that failed to parse: ${resultString.take(1000)}")
             }
 
-            Log.d(TAG, "Parsed ${dishes.size} dishes from Supabase")
+            Log.d(TAG, "=== Finished parsing. Total dishes: ${dishes.size} ===")
             dishes
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
+            Log.e(TAG, "=== CRITICAL ERROR fetching dishes ===", e)
+            Log.e(TAG, "Error type: ${e::class.simpleName}")
+            Log.e(TAG, "Error message: ${e.message}")
+            e.printStackTrace()
             emptyList()
         }
     }

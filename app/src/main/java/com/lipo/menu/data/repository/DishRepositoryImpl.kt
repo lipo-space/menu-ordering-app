@@ -27,33 +27,43 @@ class DishRepositoryImpl @Inject constructor(
      */
     suspend fun syncFromCloud() {
         try {
-            Log.d("DishRepository", "Starting sync from cloud")
-            val cloudDishes = remoteDataSource.fetchAllDishes()
+            Log.d("DishRepository", "=== Starting sync from cloud ===")
+            Log.d("DishRepository", "RemoteDataSource: $remoteDataSource")
 
-            cloudDishes.forEach { cloudDish ->
+            val cloudDishes = remoteDataSource.fetchAllDishes()
+            Log.d("DishRepository", "Fetched ${cloudDishes.size} dishes from cloud")
+
+            cloudDishes.forEachIndexed { index, cloudDish ->
                 try {
+                    Log.d("DishRepository", "Processing dish ${index + 1}/${cloudDishes.size}: ${cloudDish.name}")
+
                     // 检查本地是否已存在该菜品
                     val localDish = dishDao.getDishByIdSync(cloudDish.id)
 
                     if (localDish == null) {
                         // 本地不存在，插入
                         dishDao.insertDish(cloudDish.toEntity())
-                        Log.d("DishRepository", "Inserted dish from cloud: ${cloudDish.name}")
+                        Log.d("DishRepository", "✓ Inserted dish from cloud: ${cloudDish.name}")
                     } else {
                         // 本地已存在，比较更新时间，保留最新的
                         if (cloudDish.updatedAt.isAfter(DateUtils.toInstant(localDish.updatedAt))) {
                             dishDao.updateDish(cloudDish.toEntity())
-                            Log.d("DishRepository", "Updated dish from cloud: ${cloudDish.name}")
+                            Log.d("DishRepository", "✓ Updated dish from cloud: ${cloudDish.name}")
+                        } else {
+                            Log.d("DishRepository", "- Skipped (local is newer): ${cloudDish.name}")
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("DishRepository", "Failed to sync dish ${cloudDish.id}: ${e.message}")
+                    Log.e("DishRepository", "✗ Failed to sync dish ${cloudDish.id}: ${e.message}", e)
                 }
             }
 
-            Log.d("DishRepository", "Sync completed. Synced ${cloudDishes.size} dishes")
+            Log.d("DishRepository", "=== Sync completed. Synced ${cloudDishes.size} dishes ===")
         } catch (e: Exception) {
-            Log.e("DishRepository", "Failed to sync from cloud: ${e.message}")
+            Log.e("DishRepository", "=== CRITICAL ERROR in syncFromCloud ===", e)
+            Log.e("DishRepository", "Error type: ${e::class.simpleName}")
+            Log.e("DishRepository", "Error message: ${e.message}")
+            e.printStackTrace()
         }
     }
 

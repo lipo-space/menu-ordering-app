@@ -51,13 +51,19 @@ class DishListViewModel @Inject constructor(
     private val searchQuery = MutableStateFlow("")
 
     init {
+        Log.d("DishListViewModel", "=== ViewModel init started ===")
         // 先从云端同步数据，然后加载本地数据
         viewModelScope.launch {
             try {
+                Log.d("DishListViewModel", "Calling syncFromCloud()...")
                 dishRepository.syncFromCloud()
+                Log.d("DishListViewModel", "syncFromCloud() completed successfully")
             } catch (e: Exception) {
                 // 同步失败不影响本地数据显示
-                android.util.Log.e("DishListViewModel", "Failed to sync from cloud: ${e.message}")
+                Log.e("DishListViewModel", "=== FAILED to sync from cloud ===", e)
+                Log.e("DishListViewModel", "Error type: ${e::class.simpleName}")
+                Log.e("DishListViewModel", "Error message: ${e.message}")
+                e.printStackTrace()
             }
         }
         loadDishes()
