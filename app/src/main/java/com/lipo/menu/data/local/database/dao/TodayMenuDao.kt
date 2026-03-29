@@ -60,4 +60,13 @@ interface TodayMenuDao {
 
     @Query("SELECT COUNT(*) FROM today_menu_dishes WHERE dish_id = :dishId")
     fun getUsageCountForDish(dishId: String): Flow<Int>
+
+    @Query("SELECT * FROM today_menus WHERE id = :id LIMIT 1")
+    suspend fun getTodayMenuByIdSync(id: String): TodayMenuEntity?
+
+    @Query("SELECT * FROM today_menu_dishes WHERE today_menu_id = :todayMenuId AND dish_id = :dishId LIMIT 1")
+    suspend fun getTodayMenuDishByIdsSync(todayMenuId: String, dishId: String): TodayMenuDishEntity?
+
+    @Query("UPDATE today_menu_dishes SET `order` = :order WHERE today_menu_id = :todayMenuId AND dish_id = :dishId")
+    suspend fun updateTodayMenuDish(todayMenuId: String, dishId: String, order: Int)
 }

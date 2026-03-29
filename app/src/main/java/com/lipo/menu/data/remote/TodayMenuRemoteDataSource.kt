@@ -7,6 +7,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -144,13 +149,18 @@ class TodayMenuRemoteDataSource @Inject constructor(
                     jsonArray.forEach { element ->
                         try {
                             val obj = element.jsonObject
-                            val menuMap = mapOf(
-                                "id" to (obj["id"]?.jsonPrimitive?.content ?: ""),
-                                "date" to (obj["date"]?.jsonPrimitive?.content ?: ""),
-                                "created_at" to (obj["created_at"]?.jsonPrimitive?.content ?: ""),
-                                "updated_at" to (obj["updated_at"]?.jsonPrimitive?.content ?: "")
-                            )
-                            if (menuMap["id"].isNotEmpty() && menuMap["date"].isNotEmpty()) {
+                            val id = obj["id"]?.jsonPrimitive?.content ?: ""
+                            val date = obj["date"]?.jsonPrimitive?.content ?: ""
+                            val createdAt = obj["created_at"]?.jsonPrimitive?.content ?: ""
+                            val updatedAt = obj["updated_at"]?.jsonPrimitive?.content ?: ""
+
+                            if (id.isNotEmpty() && date.isNotEmpty()) {
+                                val menuMap = mapOf<String, Any>(
+                                    "id" to id,
+                                    "date" to date,
+                                    "created_at" to createdAt,
+                                    "updated_at" to updatedAt
+                                )
                                 menus.add(menuMap)
                             }
                         } catch (e: Exception) {
@@ -188,12 +198,16 @@ class TodayMenuRemoteDataSource @Inject constructor(
                     jsonArray.forEach { element ->
                         try {
                             val obj = element.jsonObject
-                            val dishMap = mapOf(
-                                "today_menu_id" to (obj["today_menu_id"]?.jsonPrimitive?.content ?: ""),
-                                "dish_id" to (obj["dish_id"]?.jsonPrimitive?.content ?: ""),
-                                "display_order" to (obj["display_order"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0)
-                            )
-                            if (dishMap["today_menu_id"].isNotEmpty() && dishMap["dish_id"].isNotEmpty()) {
+                            val todayMenuId = obj["today_menu_id"]?.jsonPrimitive?.content ?: ""
+                            val dishId = obj["dish_id"]?.jsonPrimitive?.content ?: ""
+                            val displayOrder = obj["display_order"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+
+                            if (todayMenuId.isNotEmpty() && dishId.isNotEmpty()) {
+                                val dishMap = mapOf<String, Any>(
+                                    "today_menu_id" to todayMenuId,
+                                    "dish_id" to dishId,
+                                    "display_order" to displayOrder
+                                )
                                 dishes.add(dishMap)
                             }
                         } catch (e: Exception) {

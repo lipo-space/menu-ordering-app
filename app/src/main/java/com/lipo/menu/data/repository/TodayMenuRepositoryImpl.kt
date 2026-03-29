@@ -92,19 +92,14 @@ class TodayMenuRepositoryImpl @Inject constructor(
                         val entity = TodayMenuDishEntity(
                             todayMenuId = todayMenuId,
                             dishId = dishId,
-                            displayOrder = displayOrder
+                            order = displayOrder
                         )
                         todayMenuDao.insertTodayMenuDish(entity)
                         Log.d("TodayMenuRepository", "Inserted today menu dish from cloud: $todayMenuId-$dishId")
                     } else {
-                        // 本地已存在，更新 display_order
-                        if (displayOrder != localDish.displayOrder) {
-                            val entity = TodayMenuDishEntity(
-                                todayMenuId = todayMenuId,
-                                dishId = dishId,
-                                displayOrder = displayOrder
-                            )
-                            todayMenuDao.updateTodayMenuDish(entity)
+                        // 本地已存在，更新 order
+                        if (displayOrder != localDish.order) {
+                            todayMenuDao.updateTodayMenuDish(todayMenuId, dishId, displayOrder)
                             Log.d("TodayMenuRepository", "Updated today menu dish from cloud: $todayMenuId-$dishId")
                         }
                     }
