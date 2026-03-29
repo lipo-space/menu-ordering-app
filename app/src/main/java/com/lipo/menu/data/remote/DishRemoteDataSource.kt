@@ -3,6 +3,7 @@ package com.lipo.menu.data.remote
 import com.lipo.menu.data.model.Dish
 import com.lipo.menu.util.DateUtils
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.UpsertOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
@@ -45,12 +46,11 @@ class DishRemoteDataSource @Inject constructor(
                     "updated_at" to JsonPrimitive(DateUtils.toISO8601(dish.updatedAt)),
                     "is_deleted" to JsonPrimitive(dish.isDeleted),
                     "user_id" to JsonPrimitive("default-user")
-                ))
-            ) {
-                filter {
-                    eq("id", dish.id)
-                }
-            }
+                )),
+                upsertOptions = UpsertOptions(
+                    onConflict = "id"
+                )
+            )
             Log.d(TAG, "Dish synced successfully: ${dish.name}")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to sync dish: ${e.message}", e)

@@ -3,11 +3,11 @@ package com.lipo.menu.data.remote
 import com.lipo.menu.data.model.TodayMenu
 import com.lipo.menu.util.DateUtils
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.UpsertOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonObject
 import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,8 +29,8 @@ class TodayMenuRemoteDataSource @Inject constructor(
      */
     suspend fun upsertTodayMenu(todayMenu: TodayMenu): Unit = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Syncing today menu to Supabase: ${todayMenu.id}")
-            // 插入菜单
+            Log.d(TAG, "Syncing today menu to Supabase: ${todayMenu.id}, date: ${todayMenu.date}")
+            // 使用 date 作为冲突解决列（因为 date 有唯一约束）
             client.from("today_menus").upsert(
                 JsonObject(mapOf(
                     "id" to JsonPrimitive(todayMenu.id),
@@ -38,12 +38,11 @@ class TodayMenuRemoteDataSource @Inject constructor(
                     "created_at" to JsonPrimitive(DateUtils.toISO8601(todayMenu.createdAt)),
                     "updated_at" to JsonPrimitive(DateUtils.toISO8601(todayMenu.updatedAt)),
                     "user_id" to JsonPrimitive("default-user")
-                ))
-            ) {
-                filter {
-                    eq("id", todayMenu.id)
-                }
-            }
+                )),
+                upsertOptions = UpsertOptions(
+                    onConflict = "date"
+                )
+            )
             Log.d(TAG, "Today menu synced successfully: ${todayMenu.id}")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to sync today menu: ${e.message}", e)
@@ -57,20 +56,17 @@ class TodayMenuRemoteDataSource @Inject constructor(
     suspend fun upsertTodayMenuDish(todayMenuId: String, dishId: String, displayOrder: Int): Unit = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "Syncing today menu dish to Supabase: $todayMenuId-$dishId")
+            // 使用复合主键作为冲突解决
             client.from("today_menu_dishes").upsert(
                 JsonObject(mapOf(
                     "today_menu_id" to JsonPrimitive(todayMenuId),
                     "dish_id" to JsonPrimitive(dishId),
                     "display_order" to JsonPrimitive(displayOrder)
-                ))
-            ) {
-                filter {
-                    and {
-                        eq("today_menu_id", todayMenuId)
-                        eq("dish_id", dishId)
-                    }
-                }
-            }
+                )),
+                upsertOptions = UpsertOptions(
+                    onConflict = "today_menu_id,dish_id"
+                )
+            )
             Log.d(TAG, "Today menu dish synced successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to sync today menu dish: ${e.message}", e)
