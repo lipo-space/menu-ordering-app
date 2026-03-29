@@ -5,57 +5,30 @@
 ### 1. 修复 isNull 编译错误
 **问题：** `Unresolved reference: isNull`
 
-**原因：** Supabase-kt 2.x 的 filter DSL 不支持 `isNull()` 函数
-
-**解决方案：**
-```kotlin
-// 之前的代码（不兼容）
-filter {
-    or {
-        eq("is_deleted", false)
-        isNull("is_deleted")  // ❌ 不支持
-    }
-}
-
-// 修复后的代码
-filter {
-    eq("is_deleted", false)  // ✅ 简单可靠
-}
-```
-
 **提交记录：** `96f1fdf` - docs: 添加 Supabase 快速修复指南
 
-### 2. 修复 UpsertOptions 编译错误 ✅ 新修复
+### 2. 修复 UpsertOptions 编译错误
 **问题：** `Unresolved reference: UpsertOptions`
-
-**原因：** Supabase-kt 2.x 不使用 `UpsertOptions` 类，`onConflict` 应该作为 `upsert()` 函数的直接参数
-
-**解决方案：**
-```kotlin
-// 之前的代码（错误）
-import io.github.jan.supabase.postgrest.UpsertOptions  // ❌ 不存在
-
-client.from("dishes").upsert(
-    JsonObject(...),
-    upsertOptions = UpsertOptions(onConflict = "id")  // ❌ 错误
-)
-
-// 修复后的代码（正确）
-// 移除 UpsertOptions 导入
-
-client.from("dishes").upsert(
-    JsonObject(...),
-    onConflict = "id"  // ✅ 正确
-)
-```
-
-**同时修复的问题：**
-- ✅ today_menus 重复键错误（使用 `onConflict = "date"`）
-- ✅ today_menu_dishes 复合主键冲突（使用 `onConflict = "today_menu_id,dish_id"`）
 
 **提交记录：** `5258fc2` - fix: 修复 UpsertOptions 编译错误
 
-### 3. 已推送到 GitHub
+### 3. 实现云端同步功能（重要！）
+**问题：** 数据无法从云端同步到本地，家庭成员无法共享数据
+
+**根本原因：** `syncFromCloud()` 方法已写好但从未被调用
+
+**解决方案：**
+- ✅ 在 DishListViewModel 和 TodayMenuViewModel 初始化时自动调用 `syncFromCloud()`
+- ✅ 实现 TodayMenuRepositoryImpl.syncFromCloud() 完整逻辑
+- ✅ 添加 TodayMenuRemoteDataSource 的 fetchAllTodayMenus 和 fetchAllTodayMenuDishes 方法
+- ✅ 添加 TodayMenuDao 的同步查询方法
+
+**提交记录：**
+- `1f8e980` - fix: 修复云端同步功能的编译错误
+- `c95ba7e` - feat: 实现完整的云端同步功能
+- `7f01b31` - feat: 在 DishListViewModel 初始化时自动从云端同步菜品数据
+
+### 4. 已推送到 GitHub
 代码已推送到 `main` 分支，GitHub Actions 正在自动构建新的 APK。
 
 ---
