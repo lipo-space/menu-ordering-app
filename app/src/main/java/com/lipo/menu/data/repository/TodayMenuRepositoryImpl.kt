@@ -11,6 +11,7 @@ import com.lipo.menu.util.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import android.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -24,6 +25,17 @@ class TodayMenuRepositoryImpl @Inject constructor(
 ) : TodayMenuRepository {
 
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+
+    /**
+     * 从云端同步数据到本地数据库
+     * 暂时不实现，因为今日菜单同步比较复杂
+     */
+    suspend fun syncFromCloud() {
+        // 今日菜单同步比较复杂，暂时不实现
+        // 因为需要同步 today_menus 和 today_menu_dishes 两张表
+        // 并且需要处理关联关系
+        Log.d("TodayMenuRepository", "Today menu sync is not implemented yet")
+    }
 
     override fun getTodayMenu(date: LocalDate): Flow<TodayMenu?> {
         return todayMenuDao.getTodayMenuByDate(date.format(dateFormatter)).map { entity ->

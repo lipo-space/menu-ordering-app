@@ -7,7 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import android.util.Log
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -63,11 +70,45 @@ class DishRemoteDataSource @Inject constructor(
                         eq("is_deleted", false)
                     }
                 }
-            Log.d(TAG, "Fetched dishes successfully: ${result.toString()}")
+            Log.d(TAG, "Fetched dishes successfully")
 
-            // TODO: 实现数据解析 - 当前版本暂时返回空列表
-            // 数据已经同步到云端，家庭成员可以看到共享数据
-            emptyList()
+            // 解析 JSON 数据
+            val dishes = mutableListOf<Dish>()
+            val resultString = result.toString()
+
+            // supabase-kt 2.x 返回的数据需要手动解析
+            // 使用正则表达式提取数据（简单方法）
+            val pattern = """id=([^,}]+),.*?name=([^,}]+),.*?description=([^,}]*),.*?created_at=([^,}]+),.*?updated_at=([^,}]+)""".toRegex(RegexOption.DOT_MATCHES_ALL)
+
+            // 更安全的方式：直接使用 kotlinx.serialization
+            try {
+                val jsonArray = kotlinx.serialization.json.Json.parseToJsonElement(resultString)
+                if (jsonArray is kotlinx.serialization.json.JsonArray) {
+                    jsonArray.forEach { element ->
+                        try {
+                            val obj = element.jsonObject
+                            val dish = Dish(
+                                id = obj["id"]?.jsonPrimitive?.content ?: "",
+                                name = obj["name"]?.jsonPrimitive?.content ?: "",
+                                description = obj["description"]?.jsonPrimitive?.contentOrNull,
+                                createdAt = DateUtils.parseISO8601(obj["created_at"]?.jsonPrimitive?.content ?: Instant.now().toString()),
+                                updatedAt = DateUtils.parseISO8601(obj["updated_at"]?.jsonPrimitive?.content ?: Instant.now().toString()),
+                                isDeleted = obj["is_deleted"]?.jsonPrimitive?.booleanOrNull ?: false
+                            )
+                            if (dish.id.isNotEmpty() && dish.name.isNotEmpty()) {
+                                dishes.add(dish)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to parse dish element: ${e.message}")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse JSON array: ${e.message}")
+            }
+
+            Log.d(TAG, "Parsed ${dishes.size} dishes from Supabase")
+            dishes
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch dishes: ${e.message}", e)
             emptyList()

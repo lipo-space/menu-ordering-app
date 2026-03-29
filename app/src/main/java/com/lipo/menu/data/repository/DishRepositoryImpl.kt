@@ -9,6 +9,7 @@ import com.lipo.menu.util.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import android.util.Log
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
@@ -19,6 +20,42 @@ class DishRepositoryImpl @Inject constructor(
     private val dishDao: DishDao,
     private val remoteDataSource: DishRemoteDataSource  // 启用云端同步
 ) : DishRepository {
+
+    /**
+     * 从云端同步数据到本地数据库
+     * 在应用启动时调用，拉取所有家庭成员的共享数据
+     */
+    suspend fun syncFromCloud() {
+        try {
+            Log.d("DishRepository", "Starting sync from cloud")
+            val cloudDishes = remoteDataSource.fetchAllDishes()
+
+            cloudDishes.forEach { cloudDish ->
+                try {
+                    // 检查本地是否已存在该菜品
+                    val localDish = dishDao.getDishByIdSync(cloudDish.id)
+
+                    if (localDish == null) {
+                        // 本地不存在，插入
+                        dishDao.insertDish(cloudDish.toEntity())
+                        Log.d("DishRepository", "Inserted dish from cloud: ${cloudDish.name}")
+                    } else {
+                        // 本地已存在，比较更新时间，保留最新的
+                        if (cloudDish.updatedAt.isAfter(DateUtils.toInstant(localDish.updatedAt))) {
+                            dishDao.updateDish(cloudDish.toEntity())
+                            Log.d("DishRepository", "Updated dish from cloud: ${cloudDish.name}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("DishRepository", "Failed to sync dish ${cloudDish.id}: ${e.message}")
+                }
+            }
+
+            Log.d("DishRepository", "Sync completed. Synced ${cloudDishes.size} dishes")
+        } catch (e: Exception) {
+            Log.e("DishRepository", "Failed to sync from cloud: ${e.message}")
+        }
+    }
 
     override fun getAllDishes(): Flow<List<Dish>> {
         return dishDao.getAllDishes().map { entities ->
