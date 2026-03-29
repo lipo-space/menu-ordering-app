@@ -1,5 +1,6 @@
 package com.lipo.menu.presentation.dish
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lipo.menu.data.model.Dish
